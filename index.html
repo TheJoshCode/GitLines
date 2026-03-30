@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GitLines - Pattern Puzzle Game</title>
+    <title>GitLines</title>
     <meta name="description" content="Test your memory and pattern recognition skills with GitLines. Trace the sequence, level up, and challenge yourself!">
     
     <!-- Google AdSense -->
@@ -22,7 +22,7 @@
         }
 
         body {
-            background: #0a0a0f;
+            background: #000000;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -38,8 +38,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(30, 30, 40, 0.6);
-            border: 1px solid rgba(102, 126, 234, 0.3);
+            background: rgba(218, 218, 218, 0.6);
+            border: 1px solid rgba(175, 175, 175, 0.3);
             border-radius: 8px;
             overflow: hidden;
         }
@@ -209,6 +209,19 @@
             background: #fff;
         }
 
+        .dot.error {
+            border-color: #ff4444;
+            background: radial-gradient(circle at 30% 30%, #ff4444, #990000);
+            box-shadow: 
+                0 0 25px rgba(255, 68, 68, 0.6),
+                0 0 50px rgba(255, 0, 0, 0.3);
+        }
+
+        .dot.error::before {
+            background: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
         svg.lines {
             position: absolute;
             inset: 0;
@@ -248,6 +261,16 @@
             to { opacity: 1; }
         }
 
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+            20%, 40%, 60%, 80% { transform: translateX(8px); }
+        }
+
+        .shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
         .hint-btn {
             margin-top: 20px;
             padding: 12px 30px;
@@ -281,7 +304,7 @@
             position: absolute;
             width: 4px;
             height: 4px;
-            background: #667eea;
+            background: #5dff4b;
             border-radius: 50%;
             pointer-events: none;
             animation: particle 1s ease-out forwards;
@@ -295,36 +318,15 @@
         .flash {
             position: fixed;
             inset: 0;
-            background: rgba(102, 126, 234, 0.2);
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity 0.15s;
             z-index: 200;
         }
 
-        .flash.show { opacity: 1; }
-
-        .overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-
-        .overlay.show { opacity: 1; pointer-events: all; }
-
-        .overlay-text {
-            color: #fff;
-            font-size: 1.5rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
+        .flash.show { opacity: 0.3; }
+        .flash.success { background: rgba(84, 208, 65, 0.4); }
+        .flash.error { background: rgba(255, 68, 68, 0.5); }
 
         /* ===== HOW TO PLAY & FOOTER STYLES ===== */
         .how-to-play {
@@ -356,7 +358,7 @@
         }
 
         footer a {
-            color: #667eea;
+            color: #adadad;
             margin: 0 10px;
             text-decoration: none;
         }
@@ -411,9 +413,6 @@
     <!-- ===== END AD PLACEMENTS ===== -->
 
     <div class="flash" id="flash"></div>
-    <div class="overlay" id="overlay">
-        <div class="overlay-text">Watch the pattern...</div>
-    </div>
     
     <div class="container">
         <div class="header">
@@ -444,9 +443,7 @@
 
     <!-- ===== FOOTER ===== -->
     <footer>
-        <a href="privacy.html">Privacy Policy</a>
-        <a href="terms.html">Terms of Service</a>
-        <div style="margin-top:8px">© 2026 GitLines</div>
+        <p>Created by <a href="https://github.com/TheJoshCode">TheJoshCode</a>●<a href="privacy.html">Privacy Policy</a>●<a href="terms.html">Terms of Service</a></p>
     </footer>
 
     <script>
@@ -472,7 +469,7 @@
                 this.status = document.getElementById('status');
                 this.hintBtn = document.getElementById('hintBtn');
                 this.flash = document.getElementById('flash');
-                this.overlay = document.getElementById('overlay');
+                this.gridContainer = document.getElementById('gridContainer');
 
                 this.init();
             }
@@ -589,12 +586,11 @@
 
             showIntroPattern() {
                 this.showingIntro = true;
-                this.overlay.classList.add('show');
                 this.hintBtn.disabled = true;
                 
                 this.clearLines();
                 this.svg.querySelectorAll('.target-line').forEach(line => line.remove());
-                this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
+                this.dots.forEach(d => d.el.classList.remove('target', 'revealed', 'error'));
                 
                 this._introTimeouts = [];
                 
@@ -626,8 +622,7 @@
                 const animateStep = (i) => {
                     if (i >= this.targetPattern.length) {
                         const cleanupTimeout = setTimeout(() => {
-                            this.overlay.classList.remove('show');
-                            this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
+                            this.dots.forEach(d => d.el.classList.remove('target', 'revealed', 'error'));
                             this.svg.querySelectorAll('.target-line').forEach(line => line.remove());
                             this.clearLines();
                             this.hintBtn.disabled = false;
@@ -656,8 +651,7 @@
                     this._introTimeouts.forEach(id => clearTimeout(id));
                     this._introTimeouts = null;
                 }
-                this.overlay.classList.remove('show');
-                this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
+                this.dots.forEach(d => d.el.classList.remove('target', 'revealed', 'error'));
                 this.svg.querySelectorAll('.target-line').forEach(line => line.remove());
                 this.clearLines();
                 this.hintBtn.disabled = false;
@@ -698,7 +692,7 @@
                         
                         if (this.currentPattern.length > 1 && index === this.currentPattern[this.currentPattern.length - 2]) {
                             const lastIndex = this.currentPattern.pop();
-                            this.dots[lastIndex].el.classList.remove('active');
+                            this.dots[lastIndex].el.classList.remove('active', 'error');
                             this.drawLines();
                             return;
                         }
@@ -775,7 +769,7 @@
 
             clearLines() {
                 this.svg.querySelectorAll('path.line').forEach(line => line.remove());
-                this.dots.forEach(d => d.el.classList.remove('active'));
+                this.dots.forEach(d => d.el.classList.remove('active', 'error'));
             }
 
             checkPattern() {
@@ -786,16 +780,44 @@
                 }
             }
 
+            vibrate(pattern) {
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(pattern);
+                }
+            }
+
             onSuccess() {
                 this.isComplete = true;
-                this.flash.classList.add('show');
-                setTimeout(() => this.flash.classList.remove('show'), 300);
+                
+                // Green flash for success
+                this.flash.className = 'flash success show';
+                setTimeout(() => this.flash.classList.remove('show'), 150);
+                
+                // Vibrate once on mobile for success
+                this.vibrate(50);
+                
                 this.createParticles();
                 setTimeout(() => { this.level++; this.generateLevel(); }, 1500);
             }
 
             onFailure() {
+                // Red flash for error
+                this.flash.className = 'flash error show';
+                setTimeout(() => this.flash.classList.remove('show'), 200);
+                
+                // Turn lines and dots red
                 this.svg.querySelectorAll('path.line').forEach(p => p.classList.add('error'));
+                this.currentPattern.forEach(idx => {
+                    this.dots[idx].el.classList.add('error');
+                });
+                
+                // Screen shake
+                this.gridContainer.classList.add('shake');
+                setTimeout(() => this.gridContainer.classList.remove('shake'), 400);
+                
+                // Vibrate twice on mobile for error
+                this.vibrate([30, 50, 30]);
+                
                 this._failureTimeout = setTimeout(() => { 
                     this.currentPattern = []; 
                     this.clearLines(); 
@@ -811,14 +833,14 @@
                     this._hintTimeouts.forEach(id => clearTimeout(id));
                 }
                 this._hintTimeouts = [];
-                this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
+                this.dots.forEach(d => d.el.classList.remove('target', 'revealed', 'error'));
                 
                 const stepDelay = 100;
                 
                 const animateHintStep = (i) => {
                     if (i >= this.targetPattern.length) {
                         const cleanupTimeout = setTimeout(() => {
-                            this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
+                            this.dots.forEach(d => d.el.classList.remove('target', 'revealed', 'error'));
                             this.hintBtn.disabled = false;
                             this._hintTimeouts = null;
                         }, 1000);
