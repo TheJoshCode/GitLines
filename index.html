@@ -16,7 +16,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #101010, #1c1c1c);
+            background: linear-gradient(135deg, #161616, #2a2a2a);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -26,6 +26,81 @@
             overflow: hidden;
         }
 
+        /* ===== AD STYLES ===== */
+        .ad-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(30, 30, 40, 0.6);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .ad-placeholder {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+            text-align: center;
+            padding: 8px;
+            pointer-events: none;
+        }
+
+        /* Desktop side ads */
+        .ad-desktop {
+            display: none;
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 160px;
+            height: 600px;
+            z-index: 50;
+        }
+
+        .ad-desktop-left { left: 20px; }
+        .ad-desktop-right { right: 20px; }
+
+        /* Mobile top/bottom ads */
+        .ad-mobile {
+            display: flex;
+            width: 100%;
+            max-width: 400px;
+            margin: 10px 0;
+            height: 90px;
+        }
+
+        .ad-mobile-top { order: -1; }
+        .ad-mobile-bottom { order: 999; }
+
+        /* Responsive breakpoints */
+        @media (min-width: 768px) {
+            .ad-desktop { display: flex; }
+            .ad-mobile { display: none; }
+            
+            body {
+                padding: 0 200px;
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .ad-desktop-left { left: 10px; }
+            .ad-desktop-right { right: 10px; }
+            .ad-desktop { width: 120px; height: 500px; }
+        }
+
+        @media (max-width: 480px) {
+            .ad-mobile { height: 70px; margin: 5px 0; }
+            .ad-placeholder { font-size: 0.65rem; padding: 4px; }
+        }
+
+        /* Prevent ads from interfering with game on mobile */
+        @media (max-width: 767px) {
+            .container {
+                z-index: 60;
+                position: relative;
+            }
+        }
+        /* ===== END AD STYLES ===== */
+
         .container {
             position: relative;
             width: 100%;
@@ -34,6 +109,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            z-index: 10;
         }
 
         .header {
@@ -54,7 +130,6 @@
             text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
         }
 
-        /* Status is kept for logic but hidden visually if you want 0 text */
         .status {
             display: none;
         }
@@ -168,29 +243,27 @@
         }
 
         .hint-btn {
-        margin-top: 20px;
-        padding: 12px 30px;
-        /* Green to Dark Green gradient */
-        background: linear-gradient(135deg, #0b7e00 0%, #11ff00 100%);
-        border: none;
-        /* Dark text often looks better on bright gradients */
-        color: #ffffff; 
-        border-radius: 25px;
-        cursor: pointer;
-        font-size: 0.9rem;
-        letter-spacing: 1px;
-        transition: all 0.3s ease;
-        text-transform: uppercase;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        font-weight: bold;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #0b7e00 0%, #11ff00 100%);
+            border: none;
+            color: #ffffff; 
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: bold;
         }
 
         .hint-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(21, 255, 0, 0.4);
-        filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(21, 255, 0, 0.4);
+            filter: brightness(1.1);
         }
 
         .hint-btn:disabled {
@@ -202,7 +275,7 @@
             position: absolute;
             width: 4px;
             height: 4px;
-            background: #667eea;
+            background: #00ff08;
             border-radius: 50%;
             pointer-events: none;
             animation: particle 1s ease-out forwards;
@@ -216,10 +289,11 @@
         .flash {
             position: fixed;
             inset: 0;
-            background: rgba(102, 126, 234, 0.2);
+            background: rgba(102, 234, 102, 0.2);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s;
+            z-index: 200;
         }
 
         .flash.show { opacity: 1; }
@@ -248,6 +322,43 @@
     </style>
 </head>
 <body>
+    <!-- ===== AD PLACEMENTS ===== -->
+    
+    <!-- Desktop Side Ads (hidden on mobile) -->
+    <div class="ad-container ad-desktop ad-desktop-left">
+        <!-- 🔥 REPLACE THIS WITH YOUR AD CODE 🔥 -->
+        <!-- Example: Google AdSense, Carbon Ads, etc. -->
+        <div class="ad-placeholder">
+            AD<br>160x600<br>Desktop Left
+        </div>
+    </div>
+    
+    <div class="ad-container ad-desktop ad-desktop-right">
+        <!-- 🔥 REPLACE THIS WITH YOUR AD CODE 🔥 -->
+        <div class="ad-placeholder">
+            AD<br>160x600<br>Desktop Right
+        </div>
+    </div>
+    
+    <!-- Mobile Top Ad (hidden on desktop) -->
+    <div class="ad-container ad-mobile ad-mobile-top">
+        <!-- 🔥 REPLACE THIS WITH YOUR AD CODE 🔥 -->
+        <!-- Example: AdSense responsive, AdMob banner, etc. -->
+        <div class="ad-placeholder">
+            AD • Mobile Top Banner • 320x90
+        </div>
+    </div>
+    
+    <!-- Mobile Bottom Ad (hidden on desktop) -->
+    <div class="ad-container ad-mobile ad-mobile-bottom">
+        <!-- 🔥 REPLACE THIS WITH YOUR AD CODE 🔥 -->
+        <div class="ad-placeholder">
+            AD • Mobile Bottom Banner • 320x90
+        </div>
+    </div>
+    
+    <!-- ===== END AD PLACEMENTS ===== -->
+
     <div class="flash" id="flash"></div>
     <div class="overlay" id="overlay">
         <div class="overlay-text">Watch the pattern...</div>
@@ -307,11 +418,9 @@
             }
 
             generateLevel() {
-                // Cancel any running intro animation from previous level
                 if (this.showingIntro) {
                     this.cancelIntroPattern();
                 }
-                // Cancel any running hint animation
                 if (this._hintTimeouts) {
                     this._hintTimeouts.forEach(id => clearTimeout(id));
                     this._hintTimeouts = null;
@@ -418,18 +527,15 @@
                 this.overlay.classList.add('show');
                 this.hintBtn.disabled = true;
                 
-                // Clear any existing animation state
                 this.clearLines();
                 this.svg.querySelectorAll('.target-line').forEach(line => line.remove());
                 this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
                 
-                // Store timeout IDs so we can clear them if needed
                 this._introTimeouts = [];
                 
                 const containerRect = this.grid.getBoundingClientRect();
-                const stepDelay = 100; // ms between each step
+                const stepDelay = 100;
                 
-                // Create all line elements first (hidden)
                 const lineElements = [];
                 for (let i = 0; i < this.targetPattern.length - 1; i++) {
                     const from = this.dots[this.targetPattern[i]];
@@ -452,10 +558,8 @@
                     lineElements.push(path);
                 }
                 
-                // Sequential animation function - shows dot i and line i (if exists)
                 const animateStep = (i) => {
                     if (i >= this.targetPattern.length) {
-                        // Animation complete - schedule cleanup
                         const cleanupTimeout = setTimeout(() => {
                             this.overlay.classList.remove('show');
                             this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
@@ -469,20 +573,16 @@
                         return;
                     }
                     
-                    // Reveal current dot
                     this.dots[this.targetPattern[i]].el.classList.add('target', 'revealed');
                     
-                    // Reveal line from previous dot to current dot (if not first dot)
                     if (i > 0 && lineElements[i - 1]) {
                         lineElements[i - 1].style.opacity = '0.8';
                     }
                     
-                    // Schedule next step
                     const nextTimeout = setTimeout(() => animateStep(i + 1), stepDelay);
                     this._introTimeouts.push(nextTimeout);
                 };
                 
-                // Start animation
                 animateStep(0);
             }
             
@@ -511,7 +611,6 @@
                     if (this.isComplete || this.showingIntro) return;
                     e.preventDefault();
                     
-                    // AIRTIGHT LOGIC: Kill any pending failure resets immediately
                     if (this._failureTimeout) {
                         clearTimeout(this._failureTimeout);
                         this._failureTimeout = null;
@@ -532,7 +631,6 @@
                     if (dot) {
                         const index = parseInt(dot.dataset.index);
                         
-                        // NEW: Backtrack logic - if you move back to the previous dot, undo the last one
                         if (this.currentPattern.length > 1 && index === this.currentPattern[this.currentPattern.length - 2]) {
                             const lastIndex = this.currentPattern.pop();
                             this.dots[lastIndex].el.classList.remove('active');
@@ -563,7 +661,7 @@
                 container.addEventListener('touchend', end);
                 window.addEventListener('resize', () => {
                     if (this.isDrawing && !this.isComplete) {
-                        this.drawLines(); // Redraw lines with new coordinates
+                        this.drawLines();
                     }
                 });
             }
@@ -583,9 +681,8 @@
                 this.dots[index].el.classList.add('active');
                 this.drawLines();
                 
-                // AIRTIGHT LOGIC: Snappy auto-submit without timeouts
                 if (this.currentPattern.length === this.targetPattern.length) {
-                    this.isDrawing = false; // Lock the drawing state instantly
+                    this.isDrawing = false;
                     this.checkPattern();
                 }
             }
@@ -634,11 +731,10 @@
 
             onFailure() {
                 this.svg.querySelectorAll('path.line').forEach(p => p.classList.add('error'));
-                // FIX: Store timeout ID for proper cleanup
                 this._failureTimeout = setTimeout(() => { 
                     this.currentPattern = []; 
                     this.clearLines(); 
-                    this._failureTimeout = null; // Clear reference after execution
+                    this._failureTimeout = null;
                 }, 800);
             }
 
@@ -646,7 +742,6 @@
                 if (this.isComplete || this.showingIntro) return;
                 this.hintBtn.disabled = true;
                 
-                // Clear any existing hint animation
                 if (this._hintTimeouts) {
                     this._hintTimeouts.forEach(id => clearTimeout(id));
                 }
