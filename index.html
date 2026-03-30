@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GitLines - Pattern Puzzle Game</title>
     <meta name="description" content="Test your memory and pattern recognition skills with GitLines. Trace the sequence, level up, and challenge yourself!">
     
@@ -19,14 +19,6 @@
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            -webkit-text-size-adjust: 100%;
-            text-size-adjust: 100%;
         }
 
         body {
@@ -35,12 +27,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: center;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             overflow-x: hidden;
-            overflow-y: auto;
             position: relative;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
         /* ===== AD STYLES ===== */
@@ -79,11 +69,10 @@
         /* Mobile top/bottom ads */
         .ad-mobile {
             display: flex;
-            width: min(100%, 400px);
-            margin: clamp(5px, 1vh, 10px) 0;
-            height: clamp(50px, 13vh, 90px);
-            align-items: center;
-            justify-content: center;
+            width: 100%;
+            max-width: 400px;
+            margin: 10px 0;
+            height: 90px;
         }
 
         .ad-mobile-top { order: -1; }
@@ -99,13 +88,14 @@
             }
         }
 
-        @media (min-width: 1100px) {
-            .ad-desktop { width: 160px; height: 600px; }
-            body { padding: 0 220px; }
+        @media (max-width: 1100px) {
+            .ad-desktop-left { left: 10px; }
+            .ad-desktop-right { right: 10px; }
+            .ad-desktop { width: 120px; height: 500px; }
         }
 
         @media (max-width: 480px) {
-            .ad-mobile { height: clamp(50px, 13vh, 70px); margin: 5px 0; }
+            .ad-mobile { height: 70px; margin: 5px 0; }
             .ad-placeholder { font-size: 0.65rem; padding: 4px; }
         }
 
@@ -121,34 +111,29 @@
             position: relative;
             width: 100%;
             max-width: 400px;
-            padding: 0;
+            padding: 0px;
             display: flex;
             flex-direction: column;
             align-items: center;
             z-index: 10;
-            flex: 1;
-            justify-content: center;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 0;
+            margin-bottom: 0px;
             color: #fff;
-            width: 100%;
-            padding: 0 10px;
         }
 
         h1 {
-            font-size: clamp(1.8rem, 6vw, 2.5rem);
+            font-size: 2.5rem;
             font-weight: 300;
-            letter-spacing: clamp(2px, 1vw, 4px);
+            letter-spacing: 4px;
             background: linear-gradient(135deg, #ffffff 0%, #c9c9c9 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: clamp(5px, 1vh, 10px);
+            margin-bottom: 1px;
             text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
-            line-height: 1.2;
         }
 
         .status {
@@ -157,18 +142,17 @@
 
         .grid-container {
             position: relative;
-            width: min(92vw, 400px);
+            width: 100%;
             aspect-ratio: 1;
-            margin: clamp(10px, 3vh, 20px) auto;
-            contain: layout style;
+            margin: 20px 0;
         }
 
         .grid {
             position: absolute;
             inset: 0;
             display: grid;
-            gap: clamp(8px, 2.5vw, 20px);
-            padding: clamp(8px, 2.5vw, 20px);
+            gap: 20px;
+            padding: 20px;
         }
 
         .dot {
@@ -181,12 +165,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Minimum 44x44px touch target per Apple HIG */
-            min-width: 44px;
-            min-height: 44px;
-            width: clamp(44px, 12vw, 80px);
-            height: clamp(44px, 12vw, 80px);
-            margin: auto;
         }
 
         .dot::before {
@@ -243,7 +221,7 @@
         path.line {
             fill: none;
             stroke: #ffffff;
-            stroke-width: clamp(3px, 0.8vw, 4px);
+            stroke-width: 4;
             stroke-linecap: round;
             stroke-linejoin: round;
             filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
@@ -259,7 +237,7 @@
         path.target-line {
             fill: none;
             stroke: #ffffff;
-            stroke-width: clamp(2px, 0.6vw, 3px);
+            stroke-width: 3;
             stroke-linecap: round;
             stroke-linejoin: round;
             filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
@@ -271,14 +249,14 @@
         }
 
         .hint-btn {
-            margin-top: clamp(15px, 3vh, 20px);
-            padding: clamp(10px, 2.5vh, 12px) clamp(24px, 6vw, 30px);
+            margin-top: 20px;
+            padding: 12px 30px;
             background: linear-gradient(135deg, #0b7e00 0%, #11ff00 100%);
             border: none;
             color: #ffffff; 
             border-radius: 25px;
             cursor: pointer;
-            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            font-size: 0.9rem;
             letter-spacing: 1px;
             transition: all 0.3s ease;
             text-transform: uppercase;
@@ -286,8 +264,6 @@
             margin-left: auto;
             margin-right: auto;
             font-weight: bold;
-            min-height: 44px;
-            min-width: 120px;
         }
 
         .hint-btn:hover {
@@ -299,18 +275,16 @@
         .hint-btn:disabled {
             opacity: 0.3;
             cursor: not-allowed;
-            transform: none !important;
         }
 
         .particle {
             position: absolute;
             width: 4px;
             height: 4px;
-            background: #2bff00;
+            background: #667eea;
             border-radius: 50%;
             pointer-events: none;
             animation: particle 1s ease-out forwards;
-            z-index: 150;
         }
 
         @keyframes particle {
@@ -321,7 +295,7 @@
         .flash {
             position: fixed;
             inset: 0;
-            background: rgba(102, 234, 115, 0.2);
+            background: rgba(102, 126, 234, 0.2);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s;
@@ -341,17 +315,15 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s;
-            padding: 20px;
         }
 
         .overlay.show { opacity: 1; pointer-events: all; }
 
         .overlay-text {
             color: #fff;
-            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            font-size: 1.5rem;
             letter-spacing: 2px;
             text-transform: uppercase;
-            text-align: center;
         }
 
         /* ===== HOW TO PLAY & FOOTER STYLES ===== */
@@ -359,94 +331,38 @@
             color: #aaa;
             max-width: 400px;
             text-align: center;
-            margin: clamp(15px, 3vh, 20px) auto;
+            margin: 20px auto;
             line-height: 1.6;
-            padding: 0 clamp(15px, 4vw, 20px);
+            padding: 0 20px;
         }
 
         .how-to-play h3 {
             color: #fff;
             margin-bottom: 10px;
-            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-size: 1.2rem;
         }
 
         .how-to-play p {
-            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            font-size: 0.9rem;
             margin-bottom: 8px;
         }
 
         footer {
             color: #666;
-            font-size: clamp(0.7rem, 2vw, 0.8rem);
-            margin: clamp(15px, 3vh, 20px) 0;
+            font-size: 0.8rem;
+            margin: 20px 0;
             text-align: center;
-            padding: clamp(15px, 3vh, 20px);
-            width: 100%;
-            max-width: 400px;
+            padding: 20px;
         }
 
         footer a {
             color: #667eea;
             margin: 0 10px;
             text-decoration: none;
-            display: inline-block;
         }
 
         footer a:hover {
             text-decoration: underline;
-        }
-
-        /* ===== EXTRA SMALL SCREENS ===== */
-        @media (max-width: 380px) {
-            .grid {
-                gap: 6px;
-                padding: 6px;
-            }
-            .dot {
-                min-width: 40px;
-                min-height: 40px;
-            }
-            h1 {
-                font-size: 1.6rem;
-                letter-spacing: 2px;
-            }
-            .hint-btn {
-                font-size: 0.75rem;
-                padding: 8px 20px;
-            }
-        }
-
-        /* ===== SHORT SCREENS (landscape mobile) ===== */
-        @media (max-height: 600px) {
-            body {
-                justify-content: flex-start;
-                padding-top: env(safe-area-inset-top);
-            }
-            .grid-container {
-                margin: 5px 0;
-                width: min(85vw, 320px);
-            }
-            .how-to-play {
-                margin: 8px auto;
-                padding: 0 10px;
-            }
-            footer {
-                margin: 10px 0;
-                padding: 10px;
-            }
-            .header {
-                margin-bottom: 5px;
-            }
-        }
-
-        /* ===== DESKTOP ENHANCEMENTS ===== */
-        @media (min-width: 768px) {
-            .hint-btn:hover {
-                transform: translateY(-2px);
-            }
-            .dot:hover {
-                transform: scale(1.05);
-            }
         }
     </style>
 </head>
@@ -521,10 +437,10 @@
     </div>
 
     <!-- ===== HOW TO PLAY SECTION ===== -->
-<!--     <div class="how-to-play">
+    <div class="how-to-play">
         <h3>How to Play</h3>
         <p>👁️ <strong>Watch</strong> the pattern light up > ✋ <strong>Trace</strong> it by connecting adjacent dots > 🎯 <strong>Complete</strong> the sequence to level up > 🧠 <strong>Challenge</strong> yourself as grids get bigger!</p>
-    </div> -->
+    </div>
 
     <!-- ===== FOOTER ===== -->
     <footer>
@@ -548,7 +464,6 @@
                 this.showingIntro = false;
                 this._introTimeouts = null;
                 this._hintTimeouts = null;
-                this._resizeTimeout = null;
 
                 this.levelsPerGrid = 5;
 
@@ -558,7 +473,6 @@
                 this.hintBtn = document.getElementById('hintBtn');
                 this.flash = document.getElementById('flash');
                 this.overlay = document.getElementById('overlay');
-                this.gridContainer = document.getElementById('gridContainer');
 
                 this.init();
             }
@@ -607,8 +521,7 @@
                         el: dot,
                         index: i,
                         row: Math.floor(i / this.gridSize),
-                        col: i % this.gridSize,
-                        rect: null // Cache for performance
+                        col: i % this.gridSize
                     });
                 }
             }
@@ -649,7 +562,6 @@
                     return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
                 });
 
-                // Shuffle neighbors for variety
                 for (let i = neighbors.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [neighbors[i], neighbors[j]] = [neighbors[j], neighbors[i]];
@@ -675,14 +587,6 @@
                 }
             }
 
-            getDotRect(dot) {
-                // Cache bounding rect for performance
-                if (!dot.rect) {
-                    dot.rect = dot.el.getBoundingClientRect();
-                }
-                return dot.rect;
-            }
-
             showIntroPattern() {
                 this.showingIntro = true;
                 this.overlay.classList.add('show');
@@ -694,7 +598,7 @@
                 
                 this._introTimeouts = [];
                 
-                const containerRect = this.gridContainer.getBoundingClientRect();
+                const containerRect = this.grid.getBoundingClientRect();
                 const stepDelay = 100;
                 
                 const lineElements = [];
@@ -702,8 +606,8 @@
                     const from = this.dots[this.targetPattern[i]];
                     const to = this.dots[this.targetPattern[i + 1]];
                     
-                    const fromRect = this.getDotRect(from);
-                    const toRect = this.getDotRect(to);
+                    const fromRect = from.el.getBoundingClientRect();
+                    const toRect = to.el.getBoundingClientRect();
                     
                     const x1 = fromRect.left + fromRect.width / 2 - containerRect.left;
                     const y1 = fromRect.top + fromRect.height / 2 - containerRect.top;
@@ -761,15 +665,13 @@
             }
 
             setupEvents() {
-                const container = this.gridContainer;
+                const container = document.getElementById('gridContainer');
 
                 const getDotFromEvent = (e) => {
                     const touch = e.touches ? e.touches[0] : e;
-                    // Use clientX/Y which accounts for viewport scaling
                     const el = document.elementFromPoint(touch.clientX, touch.clientY);
                     return el?.closest('.dot');
                 };
-
                 const start = (e) => {
                     if (this.isComplete || this.showingIntro) return;
                     e.preventDefault();
@@ -786,7 +688,6 @@
                     const dot = getDotFromEvent(e);
                     if (dot) this.addToPattern(parseInt(dot.dataset.index));
                 };
-
                 const move = (e) => {
                     if (!this.isDrawing || this.isComplete || this.showingIntro) return;
                     e.preventDefault();
@@ -795,7 +696,6 @@
                     if (dot) {
                         const index = parseInt(dot.dataset.index);
                         
-                        // Allow undo by going back to previous dot
                         if (this.currentPattern.length > 1 && index === this.currentPattern[this.currentPattern.length - 2]) {
                             const lastIndex = this.currentPattern.pop();
                             this.dots[lastIndex].el.classList.remove('active');
@@ -817,34 +717,17 @@
                     this.checkPattern();
                 };
 
-                // Mouse events
                 container.addEventListener('mousedown', start);
                 container.addEventListener('mousemove', move);
                 container.addEventListener('mouseup', end);
                 container.addEventListener('mouseleave', end);
-                
-                // Touch events with passive: false for preventDefault
                 container.addEventListener('touchstart', start, { passive: false });
                 container.addEventListener('touchmove', move, { passive: false });
                 container.addEventListener('touchend', end);
-                container.addEventListener('touchcancel', end);
-
-                // Resize handler with debounce for performance
                 window.addEventListener('resize', () => {
-                    // Debounce resize events
-                    if (this._resizeTimeout) {
-                        clearTimeout(this._resizeTimeout);
+                    if (this.isDrawing && !this.isComplete) {
+                        this.drawLines();
                     }
-                    this._resizeTimeout = setTimeout(() => {
-                        // Clear cached rects
-                        this.dots.forEach(dot => { dot.rect = null; });
-                        
-                        // Redraw active lines on orientation change
-                        if (this.isDrawing && !this.isComplete && this.currentPattern.length >= 2) {
-                            this.drawLines();
-                        }
-                        this._resizeTimeout = null;
-                    }, 100);
                 });
             }
 
@@ -863,7 +746,6 @@
                 this.dots[index].el.classList.add('active');
                 this.drawLines();
                 
-                // Auto-check if pattern is complete
                 if (this.currentPattern.length === this.targetPattern.length) {
                     this.isDrawing = false;
                     this.checkPattern();
@@ -873,21 +755,16 @@
             drawLines() {
                 this.svg.querySelectorAll('path.line').forEach(line => line.remove());
                 if (this.currentPattern.length < 2) return;
-                
-                const containerRect = this.gridContainer.getBoundingClientRect();
-                
+                const containerRect = this.grid.getBoundingClientRect();
                 for (let i = 0; i < this.currentPattern.length - 1; i++) {
                     const from = this.dots[this.currentPattern[i]];
                     const to = this.dots[this.currentPattern[i + 1]];
-                    
-                    const fromRect = this.getDotRect(from);
-                    const toRect = this.getDotRect(to);
-                    
+                    const fromRect = from.el.getBoundingClientRect();
+                    const toRect = to.el.getBoundingClientRect();
                     const x1 = fromRect.left + fromRect.width / 2 - containerRect.left;
                     const y1 = fromRect.top + fromRect.height / 2 - containerRect.top;
                     const x2 = toRect.left + toRect.width / 2 - containerRect.left;
                     const y2 = toRect.top + toRect.height / 2 - containerRect.top;
-                    
                     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                     path.setAttribute('d', `M ${x1} ${y1} L ${x2} ${y2}`);
                     path.setAttribute('class', 'line');
@@ -958,10 +835,8 @@
             }
 
             createParticles() {
-                const containerRect = this.gridContainer.getBoundingClientRect();
-                const centerX = containerRect.left + containerRect.width / 2;
-                const centerY = containerRect.top + containerRect.height / 2;
-                
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
                 for (let i = 0; i < 20; i++) {
                     const particle = document.createElement('div');
                     particle.className = 'particle';
@@ -982,16 +857,7 @@
             }
         }
 
-        // Initialize game when DOM is ready
-        let game;
-        document.addEventListener('DOMContentLoaded', () => {
-            game = new GitLines();
-        });
-        
-        // Fallback for older browsers
-        if (document.readyState !== 'loading') {
-            game = new GitLines();
-        }
+        const game = new GitLines();
     </script>
 </body>
 </html>
