@@ -46,7 +46,7 @@
             font-size: 2.5rem;
             font-weight: 300;
             letter-spacing: 4px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #c9c9c9 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -77,8 +77,8 @@
         .dot {
             position: relative;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #2a2a3a, #1a1a2e);
-            border: 2px solid #333;
+            background: radial-gradient(circle at 30% 30%, #a7a7a7, #656565);
+            border: 2px solid #000000;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
@@ -97,12 +97,11 @@
         }
 
         .dot.active {
-            border-color: #667eea;
-            background: radial-gradient(circle at 30% 30%, #667eea, #4c51bf);
+            border-color: rgb(189, 255, 182);
+            background: radial-gradient(circle at 30% 30%, #09ff00, #006107);
             box-shadow: 
-                0 0 20px rgba(102, 126, 234, 0.6),
-                0 0 40px rgba(102, 126, 234, 0.3),
-                inset 0 0 10px rgba(255, 255, 255, 0.2);
+                0 0 25px rgba(89, 255, 0, 0.6),
+                0 0 50px rgba(77, 255, 0, 0.3);
         }
 
         .dot.active::before {
@@ -111,18 +110,18 @@
         }
 
         .dot.target {
-            border-color: #fbbf24;
+            border-color: rgb(189, 255, 182);
             box-shadow: 
                 0 0 15px rgba(251, 191, 36, 0.4),
                 inset 0 0 10px rgba(251, 191, 36, 0.1);
         }
 
         .dot.target.revealed {
-            background: radial-gradient(circle at 30% 30%, #fbbf24, #d97706);
-            border-color: #fbbf24;
+            background: radial-gradient(circle at 30% 30%, #09ff00, #006107);
+            border-color: rgb(189, 255, 182);
             box-shadow: 
-                0 0 25px rgba(251, 191, 36, 0.6),
-                0 0 50px rgba(251, 191, 36, 0.3);
+                0 0 25px rgba(89, 255, 0, 0.6),
+                0 0 50px rgba(77, 255, 0, 0.3);
         }
 
         .dot.target.revealed::before {
@@ -140,27 +139,27 @@
 
         path.line {
             fill: none;
-            stroke: #667eea;
+            stroke: #ffffff;
             stroke-width: 4;
             stroke-linecap: round;
             stroke-linejoin: round;
-            filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.8));
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
             opacity: 0;
             animation: drawLine 0.3s ease forwards;
         }
 
         path.line.error {
-            stroke: #f87171;
+            stroke: #ff0000;
             filter: drop-shadow(0 0 8px rgba(248, 113, 113, 0.8));
         }
 
         path.target-line {
             fill: none;
-            stroke: #fbbf24;
+            stroke: #ffffff;
             stroke-width: 3;
             stroke-linecap: round;
             stroke-linejoin: round;
-            filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.6));
+            filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
             opacity: 0.8;
         }
 
@@ -169,25 +168,29 @@
         }
 
         .hint-btn {
-            margin-top: 20px;
-            padding: 12px 30px;
-            background: transparent;
-            border: 1px solid #667eea;
-            color: #667eea;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
+        margin-top: 20px;
+        padding: 12px 30px;
+        /* Green to Dark Green gradient */
+        background: linear-gradient(135deg, #0b7e00 0%, #11ff00 100%);
+        border: none;
+        /* Dark text often looks better on bright gradients */
+        color: #ffffff; 
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        font-weight: bold;
         }
 
         .hint-btn:hover {
-            background: rgba(102, 126, 234, 0.1);
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(21, 255, 0, 0.4);
+        filter: brightness(1.1);
         }
 
         .hint-btn:disabled {
@@ -273,6 +276,7 @@
     <script>
         class GitLines {
             constructor() {
+                this._failureTimeout = null;
                 this.level = 1;
                 this.baseSize = 3;
                 this.gridSize = this.baseSize;
@@ -503,10 +507,16 @@
                     const el = document.elementFromPoint(touch.clientX, touch.clientY);
                     return el?.closest('.dot');
                 };
-
                 const start = (e) => {
                     if (this.isComplete || this.showingIntro) return;
                     e.preventDefault();
+                    
+                    // AIRTIGHT LOGIC: Kill any pending failure resets immediately
+                    if (this._failureTimeout) {
+                        clearTimeout(this._failureTimeout);
+                        this._failureTimeout = null;
+                    }
+
                     this.isDrawing = true;
                     this.currentPattern = [];
                     this.clearLines();
@@ -514,7 +524,6 @@
                     const dot = getDotFromEvent(e);
                     if (dot) this.addToPattern(parseInt(dot.dataset.index));
                 };
-
                 const move = (e) => {
                     if (!this.isDrawing || this.isComplete || this.showingIntro) return;
                     e.preventDefault();
@@ -552,6 +561,11 @@
                 container.addEventListener('touchstart', start, { passive: false });
                 container.addEventListener('touchmove', move, { passive: false });
                 container.addEventListener('touchend', end);
+                window.addEventListener('resize', () => {
+                    if (this.isDrawing && !this.isComplete) {
+                        this.drawLines(); // Redraw lines with new coordinates
+                    }
+                });
             }
 
             isValidMove(index) {
@@ -569,13 +583,10 @@
                 this.dots[index].el.classList.add('active');
                 this.drawLines();
                 
-                // Only auto-check if the pattern is the correct length AND the last dot is correct
+                // AIRTIGHT LOGIC: Snappy auto-submit without timeouts
                 if (this.currentPattern.length === this.targetPattern.length) {
-                    // We wait a tiny bit so the user can see the final line draw
-                    setTimeout(() => {
-                        if (!this.isDrawing) return; // Don't trigger if they are still holding/moving
-                        this.checkPattern();
-                    }, 100);
+                    this.isDrawing = false; // Lock the drawing state instantly
+                    this.checkPattern();
                 }
             }
 
@@ -623,7 +634,12 @@
 
             onFailure() {
                 this.svg.querySelectorAll('path.line').forEach(p => p.classList.add('error'));
-                setTimeout(() => { this.currentPattern = []; this.clearLines(); }, 800);
+                // FIX: Store timeout ID for proper cleanup
+                this._failureTimeout = setTimeout(() => { 
+                    this.currentPattern = []; 
+                    this.clearLines(); 
+                    this._failureTimeout = null; // Clear reference after execution
+                }, 800);
             }
 
             showHint() {
