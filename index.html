@@ -31,6 +31,9 @@
             width: 100%;
             max-width: 400px;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .header {
@@ -51,41 +54,9 @@
             text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
         }
 
-        .level {
-            color: #667eea;
-            font-size: 0.9rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .difficulty {
-            color: #fbbf24;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
-            margin-top: 4px;
-        }
-
-        .progress {
-            color: #888;
-            font-size: 0.75rem;
-            margin-top: 4px;
-        }
-
+        /* Status is kept for logic but hidden visually if you want 0 text */
         .status {
-            color: #888;
-            font-size: 0.85rem;
-            margin-top: 8px;
-            min-height: 20px;
-            transition: color 0.3s;
-        }
-
-        .status.success {
-            color: #4ade80;
-            text-shadow: 0 0 10px rgba(74, 222, 128, 0.5);
-        }
-
-        .status.error {
-            color: #f87171;
+            display: none;
         }
 
         .grid-container {
@@ -209,6 +180,9 @@
             letter-spacing: 1px;
             transition: all 0.3s ease;
             text-transform: uppercase;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .hint-btn:hover {
@@ -232,14 +206,8 @@
         }
 
         @keyframes particle {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(var(--tx), var(--ty)) scale(0);
-                opacity: 0;
-            }
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
         }
 
         .flash {
@@ -251,9 +219,7 @@
             transition: opacity 0.3s;
         }
 
-        .flash.show {
-            opacity: 1;
-        }
+        .flash.show { opacity: 1; }
 
         .overlay {
             position: fixed;
@@ -268,10 +234,7 @@
             transition: opacity 0.3s;
         }
 
-        .overlay.show {
-            opacity: 1;
-            pointer-events: all;
-        }
+        .overlay.show { opacity: 1; pointer-events: all; }
 
         .overlay-text {
             color: #fff;
@@ -280,7 +243,6 @@
             text-transform: uppercase;
         }
     </style>
-<base target="_blank">
 </head>
 <body>
     <div class="flash" id="flash"></div>
@@ -290,9 +252,7 @@
     <div class="container">
         <div class="header">
             <h1>GitLines</h1>
-            <div class="level">Level <span id="levelNum">1</span> — <span id="gridSize">3</span>×<span id="gridSize2">3</span></div>
-            <div class="difficulty" id="difficulty">Easy</div>
-            <div class="status" id="status">Connect the dots to match the pattern</div>
+            <div id="status" style="display:none"></div>
         </div>
 
         <div class="grid-container" id="gridContainer">
@@ -321,22 +281,16 @@
                 this.currentPattern = [];
                 this.isDrawing = false;
                 this.isComplete = false;
-                this.hintTimeout = null;
                 this.showingIntro = false;
 
                 this.levelsPerGrid = 5;
-                this.currentGridLevel = 1;
 
                 this.grid = document.getElementById('grid');
                 this.svg = document.getElementById('svgLines');
                 this.status = document.getElementById('status');
-                this.levelNum = document.getElementById('levelNum');
-                this.gridSizeEl = document.getElementById('gridSize');
-                this.gridSize2 = document.getElementById('gridSize2');
                 this.hintBtn = document.getElementById('hintBtn');
                 this.flash = document.getElementById('flash');
                 this.overlay = document.getElementById('overlay');
-                this.difficultyEl = document.getElementById('difficulty'); // Uncommented
 
                 this.init();
             }
@@ -346,31 +300,10 @@
                 this.setupEvents();
             }
 
-            getDifficultyName(size) {
-                const names = {
-                    3: 'Easy',
-                    4: 'Medium',
-                    5: 'Hard',
-                    6: 'Expert',
-                    7: 'Master',
-                    8: 'Insane'
-                };
-                return names[size] || `Level ${size}`;
-            }
-
             generateLevel() {
                 this.gridSize = this.baseSize + Math.floor((this.level - 1) / this.levelsPerGrid);
-                this.currentGridLevel = ((this.level - 1) % this.levelsPerGrid) + 1;
-
-                this.gridSizeEl.textContent = this.gridSize;
-                this.gridSize2.textContent = this.gridSize;
-                this.levelNum.textContent = this.level;
-                this.difficultyEl.textContent = this.getDifficultyName(this.gridSize); // Uncommented
-
                 this.createGrid();
                 this.generatePattern();
-                this.render();
-
                 this.showIntroPattern();
             }
 
@@ -403,91 +336,63 @@
                 }
             }
 
-            // Generate Hamiltonian path using backtracking with randomization
             generatePattern() {
                 const totalDots = this.gridSize * this.gridSize;
-
-                // Try to generate a valid Hamiltonian path
                 let attempts = 0;
                 let success = false;
 
                 while (!success && attempts < 100) {
                     this.targetPattern = [];
                     const used = new Set();
-
-                    // Start from a random corner
                     const corners = [0, this.gridSize - 1, totalDots - this.gridSize, totalDots - 1];
                     const start = corners[Math.floor(Math.random() * corners.length)];
-
                     success = this.findHamiltonianPath(start, used, totalDots);
                     attempts++;
                 }
 
-                // Fallback: if we couldn't find a full path, use what we have
-                // (shouldn't happen often for small grids)
                 if (this.targetPattern.length < totalDots) {
-                    // Generate a simple snake pattern as fallback
                     this.generateSnakePattern();
                 }
 
                 this.currentPattern = [];
                 this.isComplete = false;
-                this.status.className = 'status'; // Uncommented
             }
 
-            // Recursive backtracking to find Hamiltonian path
             findHamiltonianPath(current, used, targetLength) {
                 this.targetPattern.push(current);
                 used.add(current);
 
-                if (this.targetPattern.length === targetLength) {
-                    return true; // Found complete path
-                }
+                if (this.targetPattern.length === targetLength) return true;
 
                 const currentDot = this.dots[current];
-
-                // Get all unused orthogonal neighbors
                 const neighbors = this.dots.filter(d => {
                     if (used.has(d.index)) return false;
                     const rowDiff = Math.abs(d.row - currentDot.row);
                     const colDiff = Math.abs(d.col - currentDot.col);
-                    // Orthogonal only: exactly one of rowDiff or colDiff must be 1, the other must be 0
                     return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
                 });
 
-                // Shuffle neighbors for randomness
                 for (let i = neighbors.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [neighbors[i], neighbors[j]] = [neighbors[j], neighbors[i]];
                 }
 
-                // Try each neighbor
                 for (const neighbor of neighbors) {
-                    if (this.findHamiltonianPath(neighbor.index, used, targetLength)) {
-                        return true;
-                    }
+                    if (this.findHamiltonianPath(neighbor.index, used, targetLength)) return true;
                 }
 
-                // Backtrack
                 this.targetPattern.pop();
                 used.delete(current);
                 return false;
             }
 
-            // Generate a snake pattern as fallback (guaranteed to visit all cells)
             generateSnakePattern() {
                 this.targetPattern = [];
                 for (let row = 0; row < this.gridSize; row++) {
                     if (row % 2 === 0) {
-                        // Left to right
-                        for (let col = 0; col < this.gridSize; col++) {
-                            this.targetPattern.push(row * this.gridSize + col);
-                        }
+                        for (let col = 0; col < this.gridSize; col++) this.targetPattern.push(row * this.gridSize + col);
                     } else {
-                        // Right to left
-                        for (let col = this.gridSize - 1; col >= 0; col--) {
-                            this.targetPattern.push(row * this.gridSize + col);
-                        }
+                        for (let col = this.gridSize - 1; col >= 0; col--) this.targetPattern.push(row * this.gridSize + col);
                     }
                 }
             }
@@ -499,6 +404,7 @@
 
                 this.clearLines();
 
+                // Get container dimensions once to ensure consistent coordinates
                 const containerRect = this.grid.getBoundingClientRect();
 
                 for (let i = 0; i < this.targetPattern.length - 1; i++) {
@@ -508,6 +414,7 @@
                     const fromRect = from.el.getBoundingClientRect();
                     const toRect = to.el.getBoundingClientRect();
 
+                    // Corrected center calculations relative to the grid container
                     const x1 = fromRect.left + fromRect.width / 2 - containerRect.left;
                     const y1 = fromRect.top + fromRect.height / 2 - containerRect.top;
                     const x2 = toRect.left + toRect.width / 2 - containerRect.left;
@@ -520,6 +427,7 @@
                     path.style.transition = 'opacity 0.3s';
                     this.svg.appendChild(path);
 
+                    // Sync the line appearing with the dot being revealed
                     setTimeout(() => {
                         path.style.opacity = '0.8';
                     }, i * 100);
@@ -531,13 +439,11 @@
                     }, i * 100);
                 });
 
+                // Clean up and start game
                 setTimeout(() => {
                     this.overlay.classList.remove('show');
                     this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
-
-                    const targetLines = this.svg.querySelectorAll('.target-line');
-                    targetLines.forEach(line => line.remove());
-
+                    this.svg.querySelectorAll('.target-line').forEach(line => line.remove());
                     this.clearLines();
                     this.hintBtn.disabled = false;
                     this.showingIntro = false;
@@ -571,8 +477,16 @@
                     const dot = getDotFromEvent(e);
                     if (dot) {
                         const index = parseInt(dot.dataset.index);
+                        
+                        // NEW: Backtrack logic - if you move back to the previous dot, undo the last one
+                        if (this.currentPattern.length > 1 && index === this.currentPattern[this.currentPattern.length - 2]) {
+                            const lastIndex = this.currentPattern.pop();
+                            this.dots[lastIndex].el.classList.remove('active');
+                            this.drawLines();
+                            return;
+                        }
+
                         if (!this.currentPattern.includes(index)) {
-                            // Validate move: must be orthogonal and adjacent to last dot
                             if (this.isValidMove(index)) {
                                 this.addToPattern(index);
                             }
@@ -590,24 +504,18 @@
                 container.addEventListener('mousemove', move);
                 container.addEventListener('mouseup', end);
                 container.addEventListener('mouseleave', end);
-
                 container.addEventListener('touchstart', start, { passive: false });
                 container.addEventListener('touchmove', move, { passive: false });
                 container.addEventListener('touchend', end);
             }
 
-            // Check if a move to the given index is valid (orthogonal and adjacent)
             isValidMove(index) {
                 if (this.currentPattern.length === 0) return true;
-
                 const lastIndex = this.currentPattern[this.currentPattern.length - 1];
                 const lastDot = this.dots[lastIndex];
                 const newDot = this.dots[index];
-
                 const rowDiff = Math.abs(newDot.row - lastDot.row);
                 const colDiff = Math.abs(newDot.col - lastDot.col);
-
-                // Must be orthogonal: exactly one of rowDiff or colDiff is 1, the other is 0
                 return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
             }
 
@@ -615,32 +523,30 @@
                 this.currentPattern.push(index);
                 this.dots[index].el.classList.add('active');
                 this.drawLines();
-
+                
+                // Only auto-check if the pattern is the correct length AND the last dot is correct
                 if (this.currentPattern.length === this.targetPattern.length) {
-                    setTimeout(() => this.checkPattern(), 100);
+                    // We wait a tiny bit so the user can see the final line draw
+                    setTimeout(() => {
+                        if (!this.isDrawing) return; // Don't trigger if they are still holding/moving
+                        this.checkPattern();
+                    }, 100);
                 }
             }
 
             drawLines() {
-                const existingLines = this.svg.querySelectorAll('path.line');
-                existingLines.forEach(line => line.remove());
-
+                this.svg.querySelectorAll('path.line').forEach(line => line.remove());
                 if (this.currentPattern.length < 2) return;
-
                 const containerRect = this.grid.getBoundingClientRect();
-
                 for (let i = 0; i < this.currentPattern.length - 1; i++) {
                     const from = this.dots[this.currentPattern[i]];
                     const to = this.dots[this.currentPattern[i + 1]];
-
                     const fromRect = from.el.getBoundingClientRect();
                     const toRect = to.el.getBoundingClientRect();
-
                     const x1 = fromRect.left + fromRect.width / 2 - containerRect.left;
                     const y1 = fromRect.top + fromRect.height / 2 - containerRect.top;
                     const x2 = toRect.left + toRect.width / 2 - containerRect.left;
                     const y2 = toRect.top + toRect.height / 2 - containerRect.top;
-
                     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                     path.setAttribute('d', `M ${x1} ${y1} L ${x2} ${y2}`);
                     path.setAttribute('class', 'line');
@@ -650,15 +556,12 @@
             }
 
             clearLines() {
-                const playerLines = this.svg.querySelectorAll('path.line');
-                playerLines.forEach(line => line.remove());
+                this.svg.querySelectorAll('path.line').forEach(line => line.remove());
                 this.dots.forEach(d => d.el.classList.remove('active'));
             }
 
             checkPattern() {
-                const isCorrect = this.arraysEqual(this.currentPattern, this.targetPattern);
-
-                if (isCorrect) {
+                if (this.arraysEqual(this.currentPattern, this.targetPattern)) {
                     this.onSuccess();
                 } else {
                     this.onFailure();
@@ -667,44 +570,23 @@
 
             onSuccess() {
                 this.isComplete = true;
-                this.status.textContent = 'Perfect! Level complete'; // Uncommented
-                this.status.className = 'status success'; // Uncommented
-
                 this.flash.classList.add('show');
                 setTimeout(() => this.flash.classList.remove('show'), 300);
-
                 this.createParticles();
-
-                setTimeout(() => {
-                    this.level++;
-                    this.generateLevel();
-                }, 1500);
+                setTimeout(() => { this.level++; this.generateLevel(); }, 1500);
             }
 
             onFailure() {
-                this.status.textContent = 'Pattern mismatch. Try again!';
-                this.status.className = 'status error';
-
-                const paths = this.svg.querySelectorAll('path.line');
-                paths.forEach(p => p.classList.add('error'));
-
-                setTimeout(() => {
-                    this.currentPattern = [];
-                    this.clearLines();
-                    this.status.className = 'status'; // Uncommented
-                }, 800);
+                this.svg.querySelectorAll('path.line').forEach(p => p.classList.add('error'));
+                setTimeout(() => { this.currentPattern = []; this.clearLines(); }, 800);
             }
 
             showHint() {
                 if (this.isComplete || this.showingIntro) return;
-
                 this.hintBtn.disabled = true;
                 this.targetPattern.forEach((index, i) => {
-                    setTimeout(() => {
-                        this.dots[index].el.classList.add('target', 'revealed');
-                    }, i * 100);
+                    setTimeout(() => { this.dots[index].el.classList.add('target', 'revealed'); }, i * 100);
                 });
-
                 setTimeout(() => {
                     this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
                     this.hintBtn.disabled = false;
@@ -714,18 +596,15 @@
             createParticles() {
                 const centerX = window.innerWidth / 2;
                 const centerY = window.innerHeight / 2;
-
                 for (let i = 0; i < 20; i++) {
                     const particle = document.createElement('div');
                     particle.className = 'particle';
                     particle.style.left = centerX + 'px';
                     particle.style.top = centerY + 'px';
-
                     const angle = (Math.PI * 2 * i) / 20;
                     const distance = 100 + Math.random() * 100;
                     particle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
                     particle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
-
                     document.body.appendChild(particle);
                     setTimeout(() => particle.remove(), 1000);
                 }
@@ -734,10 +613,6 @@
             arraysEqual(a, b) {
                 if (a.length !== b.length) return false;
                 return a.every((val, i) => val === b[i]);
-            }
-
-            render() {
-                // Initial render complete
             }
         }
 
