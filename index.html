@@ -30,7 +30,7 @@
             position: relative;
             width: 100%;
             max-width: 400px;
-            padding: 20px;
+            padding: 0px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -38,7 +38,7 @@
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 0px;
             color: #fff;
         }
 
@@ -50,7 +50,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 10px;
+            margin-bottom: 1px;
             text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
         }
 
@@ -282,6 +282,8 @@
                 this.isDrawing = false;
                 this.isComplete = false;
                 this.showingIntro = false;
+                this._introTimeouts = null;
+                this._hintTimeouts = null;
 
                 this.levelsPerGrid = 5;
 
@@ -301,6 +303,16 @@
             }
 
             generateLevel() {
+                // Cancel any running intro animation from previous level
+                if (this.showingIntro) {
+                    this.cancelIntroPattern();
+                }
+                // Cancel any running hint animation
+                if (this._hintTimeouts) {
+                    this._hintTimeouts.forEach(id => clearTimeout(id));
+                    this._hintTimeouts = null;
+                }
+                
                 this.gridSize = this.baseSize + Math.floor((this.level - 1) / this.levelsPerGrid);
                 this.createGrid();
                 this.generatePattern();
@@ -401,53 +413,86 @@
                 this.showingIntro = true;
                 this.overlay.classList.add('show');
                 this.hintBtn.disabled = true;
-
+                
+                // Clear any existing animation state
                 this.clearLines();
-
-                // Get container dimensions once to ensure consistent coordinates
+                this.svg.querySelectorAll('.target-line').forEach(line => line.remove());
+                this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
+                
+                // Store timeout IDs so we can clear them if needed
+                this._introTimeouts = [];
+                
                 const containerRect = this.grid.getBoundingClientRect();
-
+                const stepDelay = 100; // ms between each step
+                
+                // Create all line elements first (hidden)
+                const lineElements = [];
                 for (let i = 0; i < this.targetPattern.length - 1; i++) {
                     const from = this.dots[this.targetPattern[i]];
                     const to = this.dots[this.targetPattern[i + 1]];
-
+                    
                     const fromRect = from.el.getBoundingClientRect();
                     const toRect = to.el.getBoundingClientRect();
-
-                    // Corrected center calculations relative to the grid container
+                    
                     const x1 = fromRect.left + fromRect.width / 2 - containerRect.left;
                     const y1 = fromRect.top + fromRect.height / 2 - containerRect.top;
                     const x2 = toRect.left + toRect.width / 2 - containerRect.left;
                     const y2 = toRect.top + toRect.height / 2 - containerRect.top;
-
+                    
                     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                     path.setAttribute('d', `M ${x1} ${y1} L ${x2} ${y2}`);
                     path.setAttribute('class', 'target-line');
                     path.style.opacity = '0';
-                    path.style.transition = 'opacity 0.3s';
+                    path.style.transition = 'opacity 0.2s ease';
                     this.svg.appendChild(path);
-
-                    // Sync the line appearing with the dot being revealed
-                    setTimeout(() => {
-                        path.style.opacity = '0.8';
-                    }, i * 100);
+                    lineElements.push(path);
                 }
-
-                this.targetPattern.forEach((index, i) => {
-                    setTimeout(() => {
-                        this.dots[index].el.classList.add('target', 'revealed');
-                    }, i * 100);
-                });
-
-                // Clean up and start game
-                setTimeout(() => {
-                    this.overlay.classList.remove('show');
-                    this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
-                    this.svg.querySelectorAll('.target-line').forEach(line => line.remove());
-                    this.clearLines();
-                    this.hintBtn.disabled = false;
-                    this.showingIntro = false;
-                }, this.targetPattern.length * 100 + 1500);
+                
+                // Sequential animation function - shows dot i and line i (if exists)
+                const animateStep = (i) => {
+                    if (i >= this.targetPattern.length) {
+                        // Animation complete - schedule cleanup
+                        const cleanupTimeout = setTimeout(() => {
+                            this.overlay.classList.remove('show');
+                            this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
+                            this.svg.querySelectorAll('.target-line').forEach(line => line.remove());
+                            this.clearLines();
+                            this.hintBtn.disabled = false;
+                            this.showingIntro = false;
+                            this._introTimeouts = null;
+                        }, 1500);
+                        this._introTimeouts.push(cleanupTimeout);
+                        return;
+                    }
+                    
+                    // Reveal current dot
+                    this.dots[this.targetPattern[i]].el.classList.add('target', 'revealed');
+                    
+                    // Reveal line from previous dot to current dot (if not first dot)
+                    if (i > 0 && lineElements[i - 1]) {
+                        lineElements[i - 1].style.opacity = '0.8';
+                    }
+                    
+                    // Schedule next step
+                    const nextTimeout = setTimeout(() => animateStep(i + 1), stepDelay);
+                    this._introTimeouts.push(nextTimeout);
+                };
+                
+                // Start animation
+                animateStep(0);
+            }
+            
+            cancelIntroPattern() {
+                if (this._introTimeouts) {
+                    this._introTimeouts.forEach(id => clearTimeout(id));
+                    this._introTimeouts = null;
+                }
+                this.overlay.classList.remove('show');
+                this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
+                this.svg.querySelectorAll('.target-line').forEach(line => line.remove());
+                this.clearLines();
+                this.hintBtn.disabled = false;
+                this.showingIntro = false;
             }
 
             setupEvents() {
@@ -584,13 +629,33 @@
             showHint() {
                 if (this.isComplete || this.showingIntro) return;
                 this.hintBtn.disabled = true;
-                this.targetPattern.forEach((index, i) => {
-                    setTimeout(() => { this.dots[index].el.classList.add('target', 'revealed'); }, i * 100);
-                });
-                setTimeout(() => {
-                    this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
-                    this.hintBtn.disabled = false;
-                }, 2000);
+                
+                // Clear any existing hint animation
+                if (this._hintTimeouts) {
+                    this._hintTimeouts.forEach(id => clearTimeout(id));
+                }
+                this._hintTimeouts = [];
+                this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
+                
+                const stepDelay = 100;
+                
+                const animateHintStep = (i) => {
+                    if (i >= this.targetPattern.length) {
+                        const cleanupTimeout = setTimeout(() => {
+                            this.dots.forEach(d => d.el.classList.remove('target', 'revealed'));
+                            this.hintBtn.disabled = false;
+                            this._hintTimeouts = null;
+                        }, 1000);
+                        this._hintTimeouts.push(cleanupTimeout);
+                        return;
+                    }
+                    
+                    this.dots[this.targetPattern[i]].el.classList.add('target', 'revealed');
+                    const nextTimeout = setTimeout(() => animateHintStep(i + 1), stepDelay);
+                    this._hintTimeouts.push(nextTimeout);
+                };
+                
+                animateHintStep(0);
             }
 
             createParticles() {
