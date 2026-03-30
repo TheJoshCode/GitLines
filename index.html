@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GitLines</title>
+    <title>GitLines - Pattern Puzzle Game</title>
+    <meta name="description" content="Test your memory and pattern recognition skills with GitLines. Trace the sequence, level up, and challenge yourself!">
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2305918327063894"
+         crossorigin="anonymous"></script>
+    
     <style>
         * {
             margin: 0;
@@ -16,14 +22,15 @@
         }
 
         body {
-            background: linear-gradient(135deg, #161616, #2a2a2a);
+            background: #0a0a0f;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
+            position: relative;
         }
 
         /* ===== AD STYLES ===== */
@@ -92,7 +99,6 @@
             .ad-placeholder { font-size: 0.65rem; padding: 4px; }
         }
 
-        /* Prevent ads from interfering with game on mobile */
         @media (max-width: 767px) {
             .container {
                 z-index: 60;
@@ -275,7 +281,7 @@
             position: absolute;
             width: 4px;
             height: 4px;
-            background: #00ff08;
+            background: #667eea;
             border-radius: 50%;
             pointer-events: none;
             animation: particle 1s ease-out forwards;
@@ -289,7 +295,7 @@
         .flash {
             position: fixed;
             inset: 0;
-            background: rgba(102, 234, 102, 0.2);
+            background: rgba(102, 126, 234, 0.2);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s;
@@ -319,50 +325,96 @@
             letter-spacing: 2px;
             text-transform: uppercase;
         }
+
+        /* ===== HOW TO PLAY & FOOTER STYLES ===== */
+        .how-to-play {
+            color: #aaa;
+            max-width: 400px;
+            text-align: center;
+            margin: 20px auto;
+            line-height: 1.6;
+            padding: 0 20px;
+        }
+
+        .how-to-play h3 {
+            color: #fff;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .how-to-play p {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        footer {
+            color: #666;
+            font-size: 0.8rem;
+            margin: 20px 0;
+            text-align: center;
+            padding: 20px;
+        }
+
+        footer a {
+            color: #667eea;
+            margin: 0 10px;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <!-- ===== AD PLACEMENTS ===== -->
     
-    <!-- Desktop Side Ads (hidden on mobile) -->
+    <!-- Desktop Left Sidebar -->
     <div class="ad-container ad-desktop ad-desktop-left">
-        <!-- 🔥 REPLACE THIS WITH YOUR AD CODE 🔥 -->
-        <!-- Example: Google AdSense, Carbon Ads, etc. -->
-        <div class="ad-placeholder">
-            AD<br>160x600<br>Desktop Left
-        </div>
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:160px;height:600px"
+             data-ad-client="ca-pub-2305918327063894"
+             data-ad-slot="DESKTOP_LEFT_SLOT"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
     
+    <!-- Desktop Right Sidebar -->
     <div class="ad-container ad-desktop ad-desktop-right">
-        <!-- 🔥 REPLACE THIS WITH YOUR AD CODE 🔥 -->
-        <div class="ad-placeholder">
-            AD<br>160x600<br>Desktop Right
-        </div>
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:160px;height:600px"
+             data-ad-client="ca-pub-2305918327063894"
+             data-ad-slot="DESKTOP_RIGHT_SLOT"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
     
-    <!-- Mobile Top Ad (hidden on desktop) -->
+    <!-- Mobile Top Banner -->
     <div class="ad-container ad-mobile ad-mobile-top">
-        <!-- 🔥 REPLACE THIS WITH YOUR AD CODE 🔥 -->
-        <!-- Example: AdSense responsive, AdMob banner, etc. -->
-        <div class="ad-placeholder">
-            AD • Mobile Top Banner • 320x90
-        </div>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-format="fluid"
+             data-ad-layout-key="-fb+5w+4e-db+86"
+             data-ad-client="ca-pub-2305918327063894"
+             data-ad-slot="MOBILE_TOP_SLOT"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
     
-    <!-- Mobile Bottom Ad (hidden on desktop) -->
+    <!-- Mobile Bottom Banner -->
     <div class="ad-container ad-mobile ad-mobile-bottom">
-        <!-- 🔥 REPLACE THIS WITH YOUR AD CODE 🔥 -->
-        <div class="ad-placeholder">
-            AD • Mobile Bottom Banner • 320x90
-        </div>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-format="fluid"
+             data-ad-layout-key="-fb+5w+4e-db+86"
+             data-ad-client="ca-pub-2305918327063894"
+             data-ad-slot="MOBILE_BOTTOM_SLOT"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
-    
     <!-- ===== END AD PLACEMENTS ===== -->
 
     <div class="flash" id="flash"></div>
     <div class="overlay" id="overlay">
         <div class="overlay-text">Watch the pattern...</div>
     </div>
+    
     <div class="container">
         <div class="header">
             <h1>GitLines</h1>
@@ -383,6 +435,19 @@
 
         <button class="hint-btn" id="hintBtn" onclick="game.showHint()">Show Pattern</button>
     </div>
+
+    <!-- ===== HOW TO PLAY SECTION ===== -->
+    <div class="how-to-play">
+        <h3>How to Play</h3>
+        <p>👁️ <strong>Watch</strong> the pattern light up > ✋ <strong>Trace</strong> it by connecting adjacent dots > 🎯 <strong>Complete</strong> the sequence to level up > 🧠 <strong>Challenge</strong> yourself as grids get bigger!</p>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="terms.html">Terms of Service</a>
+        <div style="margin-top:8px">© 2026 GitLines</div>
+    </footer>
 
     <script>
         class GitLines {
