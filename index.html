@@ -9,11 +9,26 @@
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2305918327063894"
          crossorigin="anonymous"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
+        :root {
+            --green: #09ff00;
+            --green-dim: #006107;
+            --green-glow: rgba(9,255,0,0.5);
+            --red: #ff4444;
+            --gold: #ffd700;
+            --bg: #000000;
+            --dot-base: #555;
+            --text: #ffffff;
+            --text-dim: #888;
+            --panel-bg: rgba(255,255,255,0.04);
+            --panel-border: rgba(255,255,255,0.08);
+        }
+
         * {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             box-sizing: border-box;
             touch-action: none;
             -webkit-touch-callout: none;
@@ -22,15 +37,44 @@
         }
 
         body {
-            background: #000000;
+            background: #000;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Space Mono', monospace;
             overflow-x: hidden;
             position: relative;
+        }
+
+        /* Animated background grid */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(9,255,0,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(9,255,0,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Scanline effect */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.08) 2px,
+                rgba(0,0,0,0.08) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
         }
 
         /* ===== AD STYLES ===== */
@@ -43,7 +87,6 @@
             border-radius: 8px;
             overflow: hidden;
         }
-
         .ad-placeholder {
             color: rgba(255, 255, 255, 0.5);
             font-size: 0.75rem;
@@ -51,8 +94,6 @@
             padding: 8px;
             pointer-events: none;
         }
-
-        /* Desktop side ads */
         .ad-desktop {
             display: none;
             position: fixed;
@@ -62,11 +103,8 @@
             height: 600px;
             z-index: 50;
         }
-
         .ad-desktop-left { left: 20px; }
         .ad-desktop-right { right: 20px; }
-
-        /* Mobile top/bottom ads */
         .ad-mobile {
             display: flex;
             width: 100%;
@@ -74,36 +112,24 @@
             margin: 10px 0;
             height: 90px;
         }
-
         .ad-mobile-top { order: -1; }
         .ad-mobile-bottom { order: 999; }
-
-        /* Responsive breakpoints */
         @media (min-width: 768px) {
             .ad-desktop { display: flex; }
             .ad-mobile { display: none; }
-            
-            body {
-                padding: 0 200px;
-            }
+            body { padding: 0 200px; }
         }
-
         @media (max-width: 1100px) {
             .ad-desktop-left { left: 10px; }
             .ad-desktop-right { right: 10px; }
             .ad-desktop { width: 120px; height: 500px; }
         }
-
         @media (max-width: 480px) {
             .ad-mobile { height: 70px; margin: 5px 0; }
             .ad-placeholder { font-size: 0.65rem; padding: 4px; }
         }
-
         @media (max-width: 767px) {
-            .container {
-                z-index: 60;
-                position: relative;
-            }
+            .container { z-index: 60; position: relative; }
         }
         /* ===== END AD STYLES ===== */
 
@@ -118,33 +144,139 @@
             z-index: 10;
         }
 
+        /* ===== HEADER ===== */
         .header {
             text-align: center;
-            margin-bottom: 0px;
-            color: #fff;
+            margin-bottom: 8px;
+            width: 100%;
         }
 
         h1 {
-            font-size: 2.5rem;
-            font-weight: 300;
-            letter-spacing: 4px;
-            background: linear-gradient(135deg, #ffffff 0%, #c9c9c9 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1px;
-            text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: 6px;
+            color: var(--green);
+            text-shadow: 
+                0 0 20px var(--green-glow),
+                0 0 40px rgba(9,255,0,0.2);
+            margin-bottom: 2px;
         }
 
-        .status {
+        .tagline {
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        /* ===== STATS BAR ===== */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .stat-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .stat-label {
+            font-size: 0.55rem;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .stat-value.green { color: var(--green); text-shadow: 0 0 10px var(--green-glow); }
+        .stat-value.gold { color: var(--gold); text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+
+        /* Lives display */
+        .lives-display {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .heart {
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 4px rgba(255,68,68,0.6));
+        }
+
+        .heart.lost {
+            filter: none;
+            opacity: 0.2;
+            transform: scale(0.8);
+        }
+
+        /* Streak flame */
+        .streak-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .streak-fire {
+            font-size: 0.9rem;
+        }
+
+        /* ===== DAILY BADGE ===== */
+        .daily-badge {
             display: none;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,140,0,0.1));
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
+        .daily-badge.visible { display: flex; }
+        .daily-badge:hover { background: linear-gradient(135deg, rgba(255,215,0,0.25), rgba(255,140,0,0.2)); }
+
+        .daily-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow: 0 0 6px rgba(255,215,0,0.8);
+            animation: pulse-gold 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-gold {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.7; }
+        }
+
+        /* ===== GRID ===== */
         .grid-container {
             position: relative;
             width: 100%;
             aspect-ratio: 1;
-            margin: 20px 0;
+            margin: 8px 0;
         }
 
         .grid {
@@ -158,8 +290,8 @@
         .dot {
             position: relative;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #a7a7a7, #656565);
-            border: 2px solid #000000;
+            background: radial-gradient(circle at 30% 30%, #555, #222);
+            border: 2px solid #333;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
@@ -180,47 +312,34 @@
         .dot.active {
             border-color: rgb(189, 255, 182);
             background: radial-gradient(circle at 30% 30%, #09ff00, #006107);
-            box-shadow: 
-                0 0 25px rgba(89, 255, 0, 0.6),
-                0 0 50px rgba(77, 255, 0, 0.3);
+            box-shadow: 0 0 25px rgba(89,255,0,0.6), 0 0 50px rgba(77,255,0,0.3);
         }
 
         .dot.active::before {
             background: #fff;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 10px rgba(255,255,255,0.8);
         }
 
         .dot.target {
-            border-color: rgb(189, 255, 182);
-            box-shadow: 
-                0 0 15px rgba(251, 191, 36, 0.4),
-                inset 0 0 10px rgba(251, 191, 36, 0.1);
+            border-color: rgb(189,255,182);
+            box-shadow: 0 0 15px rgba(251,191,36,0.4), inset 0 0 10px rgba(251,191,36,0.1);
         }
 
         .dot.target.revealed {
             background: radial-gradient(circle at 30% 30%, #09ff00, #006107);
-            border-color: rgb(189, 255, 182);
-            box-shadow: 
-                0 0 25px rgba(89, 255, 0, 0.6),
-                0 0 50px rgba(77, 255, 0, 0.3);
+            border-color: rgb(189,255,182);
+            box-shadow: 0 0 25px rgba(89,255,0,0.6), 0 0 50px rgba(77,255,0,0.3);
         }
 
-        .dot.target.revealed::before {
-            background: #fff;
-        }
+        .dot.target.revealed::before { background: #fff; }
 
         .dot.error {
             border-color: #ff4444;
             background: radial-gradient(circle at 30% 30%, #ff4444, #990000);
-            box-shadow: 
-                0 0 25px rgba(255, 68, 68, 0.6),
-                0 0 50px rgba(255, 0, 0, 0.3);
+            box-shadow: 0 0 25px rgba(255,68,68,0.6), 0 0 50px rgba(255,0,0,0.3);
         }
 
-        .dot.error::before {
-            background: #fff;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-        }
+        .dot.error::before { background: #fff; }
 
         svg.lines {
             position: absolute;
@@ -237,14 +356,14 @@
             stroke-width: 4;
             stroke-linecap: round;
             stroke-linejoin: round;
-            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.8));
             opacity: 0;
             animation: drawLine 0.3s ease forwards;
         }
 
         path.line.error {
             stroke: #ff0000;
-            filter: drop-shadow(0 0 8px rgba(248, 113, 113, 0.8));
+            filter: drop-shadow(0 0 8px rgba(248,113,113,0.8));
         }
 
         path.target-line {
@@ -253,13 +372,11 @@
             stroke-width: 3;
             stroke-linecap: round;
             stroke-linejoin: round;
-            filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+            filter: drop-shadow(0 0 6px rgba(255,255,255,0.6));
             opacity: 0.8;
         }
 
-        @keyframes drawLine {
-            to { opacity: 1; }
-        }
+        @keyframes drawLine { to { opacity: 1; } }
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -267,39 +384,65 @@
             20%, 40%, 60%, 80% { transform: translateX(8px); }
         }
 
-        .shake {
-            animation: shake 0.4s ease-in-out;
+        .shake { animation: shake 0.4s ease-in-out; }
+
+        /* ===== BOTTOM CONTROLS ===== */
+        .controls {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+            margin-top: 4px;
         }
 
         .hint-btn {
-            margin-top: 20px;
-            padding: 12px 30px;
+            padding: 10px 24px;
             background: linear-gradient(135deg, #0b7e00 0%, #11ff00 100%);
             border: none;
-            color: #ffffff; 
+            color: #000;
             border-radius: 25px;
             cursor: pointer;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
             font-weight: bold;
+            font-family: 'Space Mono', monospace;
         }
 
         .hint-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(21, 255, 0, 0.4);
+            box-shadow: 0 5px 15px rgba(21,255,0,0.4);
             filter: brightness(1.1);
         }
 
         .hint-btn:disabled {
             opacity: 0.3;
             cursor: not-allowed;
+            transform: none;
         }
 
+        .daily-btn {
+            padding: 10px 18px;
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,140,0,0.15));
+            border: 1px solid rgba(255,215,0,0.4);
+            color: var(--gold);
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .daily-btn:hover {
+            background: linear-gradient(135deg, rgba(255,215,0,0.3), rgba(255,140,0,0.25));
+            transform: translateY(-2px);
+        }
+
+        /* ===== PARTICLES ===== */
         .particle {
             position: absolute;
             width: 4px;
@@ -311,10 +454,11 @@
         }
 
         @keyframes particle {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            0% { transform: translate(0,0) scale(1); opacity: 1; }
             100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
         }
 
+        /* ===== FLASH ===== */
         .flash {
             position: fixed;
             inset: 0;
@@ -325,561 +469,1227 @@
         }
 
         .flash.show { opacity: 0.3; }
-        .flash.success { background: rgba(84, 208, 65, 0.4); }
-        .flash.error { background: rgba(255, 68, 68, 0.5); }
+        .flash.success { background: rgba(84,208,65,0.4); }
+        .flash.error { background: rgba(255,68,68,0.5); }
 
-        /* ===== HOW TO PLAY & FOOTER STYLES ===== */
-        .how-to-play {
-            color: #aaa;
-            max-width: 400px;
+        /* ===== GAME OVER OVERLAY ===== */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 300;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .overlay.visible { display: flex; }
+
+        .overlay-box {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 32px 40px;
             text-align: center;
-            margin: 20px auto;
-            line-height: 1.6;
-            padding: 0 20px;
+            max-width: 320px;
+            width: 100%;
         }
 
-        .how-to-play h3 {
+        .overlay-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--red);
+            text-shadow: 0 0 20px rgba(255,68,68,0.5);
+            margin-bottom: 6px;
+            letter-spacing: 3px;
+        }
+
+        .overlay-title.daily { color: var(--gold); text-shadow: 0 0 20px rgba(255,215,0,0.5); }
+
+        .overlay-sub {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        .overlay-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .overlay-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .overlay-stat-row:last-child { border-bottom: none; }
+
+        .overlay-stat-label {
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .overlay-stat-val {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .overlay-stat-val.highlight { color: var(--green); }
+        .overlay-stat-val.new-record {
+            color: var(--gold);
+            animation: pulse-glow 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%,100% { text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+            50% { text-shadow: 0 0 25px rgba(255,215,0,1); }
+        }
+
+        .new-record-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--gold), #ff8c00);
+            color: #000;
+            font-size: 0.55rem;
+            letter-spacing: 1px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+
+        .overlay-btn {
+            padding: 13px 32px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .overlay-btn.primary {
+            background: linear-gradient(135deg, #0b7e00, #11ff00);
+            color: #000;
+            box-shadow: 0 0 20px rgba(9,255,0,0.3);
+        }
+
+        .overlay-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(9,255,0,0.5);
+        }
+
+        .share-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .share-btn:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+
+        /* ===== STREAK POPUP ===== */
+        .streak-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            background: linear-gradient(135deg, rgba(255,100,0,0.9), rgba(255,50,0,0.8));
+            border: 1px solid rgba(255,150,50,0.5);
+            border-radius: 16px;
+            padding: 16px 28px;
+            text-align: center;
+            z-index: 250;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .streak-popup.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .streak-popup-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
             color: #fff;
-            margin-bottom: 10px;
-            font-size: 1.2rem;
+            font-weight: 900;
         }
 
-        .how-to-play p {
+        .streak-popup-sub {
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.7);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* ===== LEVEL UP MILESTONE ===== */
+        .milestone-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            background: linear-gradient(135deg, rgba(9,100,0,0.95), rgba(9,40,0,0.9));
+            border: 1px solid rgba(9,255,0,0.3);
+            border-radius: 16px;
+            padding: 18px 32px;
+            text-align: center;
+            z-index: 250;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .milestone-popup.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .milestone-title {
+            font-family: 'Orbitron', sans-serif;
             font-size: 0.9rem;
+            color: var(--green);
+            font-weight: 900;
+            text-shadow: 0 0 15px var(--green-glow);
+            letter-spacing: 2px;
+        }
+
+        .milestone-sub {
+            font-size: 0.6rem;
+            color: rgba(9,255,0,0.6);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* ===== MODE SWITCHER ===== */
+        .mode-switcher {
+            display: flex;
+            gap: 0;
+            width: 100%;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 25px;
+            padding: 3px;
             margin-bottom: 8px;
         }
 
-        footer {
-            color: #666;
-            font-size: 0.8rem;
-            margin: 20px 0;
+        .mode-btn {
+            flex: 1;
+            padding: 7px 0;
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-family: 'Space Mono', monospace;
+            border-radius: 20px;
+            transition: all 0.25s ease;
+        }
+
+        .mode-btn.active {
+            background: rgba(9,255,0,0.12);
+            color: var(--green);
+            border: 1px solid rgba(9,255,0,0.25);
+            text-shadow: 0 0 8px var(--green-glow);
+        }
+
+        /* ===== DAILY CHALLENGE COMPLETE SPECIAL ===== */
+        .daily-complete-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .daily-stat-tile {
+            background: rgba(255,215,0,0.05);
+            border: 1px solid rgba(255,215,0,0.15);
+            border-radius: 10px;
+            padding: 12px 8px;
             text-align: center;
-            padding: 20px;
         }
 
-        footer a {
-            color: #adadad;
-            margin: 0 10px;
-            text-decoration: none;
+        .daily-tile-label {
+            font-size: 0.55rem;
+            letter-spacing: 2px;
+            color: rgba(255,215,0,0.5);
+            text-transform: uppercase;
+            margin-bottom: 4px;
         }
 
-        footer a:hover {
-            text-decoration: underline;
+        .daily-tile-val {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--gold);
+            font-weight: 700;
         }
+
+        /* ===== STATUS LINE ===== */
+        .status-line {
+            font-size: 0.62rem;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            text-align: center;
+            min-height: 16px;
+            margin: 4px 0;
+        }
+
+        footer {
+            color: #444;
+            font-size: 0.7rem;
+            margin: 16px 0;
+            text-align: center;
+            padding: 10px 20px;
+            z-index: 10;
+        }
+
+        footer a { color: #666; margin: 0 10px; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        /* ===== HEART LOSS ANIMATION ===== */
+        @keyframes heartPop {
+            0% { transform: scale(1.5); filter: drop-shadow(0 0 8px red); }
+            100% { transform: scale(0.8); filter: none; opacity: 0.2; }
+        }
+
+        .heart.losing { animation: heartPop 0.4s ease forwards; }
     </style>
 </head>
 <body>
+
     <!-- ===== AD PLACEMENTS ===== -->
-    
-    <!-- Desktop Left Sidebar -->
     <div class="ad-container ad-desktop ad-desktop-left">
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:160px;height:600px"
-             data-ad-client="ca-pub-2305918327063894"
-             data-ad-slot="DESKTOP_LEFT_SLOT"></ins>
+        <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px"
+             data-ad-client="ca-pub-2305918327063894" data-ad-slot="DESKTOP_LEFT_SLOT"></ins>
         <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
-    
-    <!-- Desktop Right Sidebar -->
     <div class="ad-container ad-desktop ad-desktop-right">
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:160px;height:600px"
-             data-ad-client="ca-pub-2305918327063894"
-             data-ad-slot="DESKTOP_RIGHT_SLOT"></ins>
+        <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px"
+             data-ad-client="ca-pub-2305918327063894" data-ad-slot="DESKTOP_RIGHT_SLOT"></ins>
         <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
-    
-    <!-- Mobile Top Banner -->
     <div class="ad-container ad-mobile ad-mobile-top">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-format="fluid"
+        <ins class="adsbygoogle" style="display:block" data-ad-format="fluid"
              data-ad-layout-key="-fb+5w+4e-db+86"
-             data-ad-client="ca-pub-2305918327063894"
-             data-ad-slot="MOBILE_TOP_SLOT"></ins>
+             data-ad-client="ca-pub-2305918327063894" data-ad-slot="MOBILE_TOP_SLOT"></ins>
         <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
-    
-    <!-- Mobile Bottom Banner -->
     <div class="ad-container ad-mobile ad-mobile-bottom">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-format="fluid"
+        <ins class="adsbygoogle" style="display:block" data-ad-format="fluid"
              data-ad-layout-key="-fb+5w+4e-db+86"
-             data-ad-client="ca-pub-2305918327063894"
-             data-ad-slot="MOBILE_BOTTOM_SLOT"></ins>
+             data-ad-client="ca-pub-2305918327063894" data-ad-slot="MOBILE_BOTTOM_SLOT"></ins>
         <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
     <!-- ===== END AD PLACEMENTS ===== -->
 
     <div class="flash" id="flash"></div>
-    
+
+    <!-- Streak popup -->
+    <div class="streak-popup" id="streakPopup">
+        <div class="streak-popup-title" id="streakPopupTitle">🔥 3 Streak!</div>
+        <div class="streak-popup-sub">On fire!</div>
+    </div>
+
+    <!-- Milestone popup -->
+    <div class="milestone-popup" id="milestonePopup">
+        <div class="milestone-title" id="milestoneTitle">⚡ LEVEL 10!</div>
+        <div class="milestone-sub">Grid Expanded</div>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div class="overlay" id="gameOverOverlay">
+        <div class="overlay-box">
+            <div class="overlay-title" id="overlayTitle">GAME OVER</div>
+            <div class="overlay-sub" id="overlaySub">Lives depleted</div>
+            <div class="overlay-stats">
+                <div class="overlay-stat-row">
+                    <span class="overlay-stat-label">Level Reached</span>
+                    <span class="overlay-stat-val highlight" id="finalLevel">—</span>
+                </div>
+                <div class="overlay-stat-row">
+                    <span class="overlay-stat-label">Score</span>
+                    <span class="overlay-stat-val" id="finalScore">—</span>
+                </div>
+                <div class="overlay-stat-row">
+                    <span class="overlay-stat-label">Best Streak</span>
+                    <span class="overlay-stat-val" id="finalStreak">—</span>
+                </div>
+                <div class="overlay-stat-row">
+                    <span class="overlay-stat-label">High Score</span>
+                    <span class="overlay-stat-val" id="finalHighScore">—</span>
+                </div>
+            </div>
+            <button class="overlay-btn primary" onclick="game.restartGame()">Play Again</button>
+            <div style="margin-top:12px">
+                <button class="share-btn" onclick="game.shareScore()">📋 Copy Score</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Challenge Complete Overlay -->
+    <div class="overlay" id="dailyCompleteOverlay">
+        <div class="overlay-box">
+            <div class="overlay-title daily">☀️ DAILY DONE</div>
+            <div class="overlay-sub">Challenge complete!</div>
+            <div class="daily-complete-grid">
+                <div class="daily-stat-tile">
+                    <div class="daily-tile-label">Level</div>
+                    <div class="daily-tile-val" id="dailyFinalLevel">—</div>
+                </div>
+                <div class="daily-stat-tile">
+                    <div class="daily-tile-label">Score</div>
+                    <div class="daily-tile-val" id="dailyFinalScore">—</div>
+                </div>
+                <div class="daily-stat-tile">
+                    <div class="daily-tile-label">Errors</div>
+                    <div class="daily-tile-val" id="dailyFinalErrors">—</div>
+                </div>
+                <div class="daily-stat-tile">
+                    <div class="daily-tile-label">Streak</div>
+                    <div class="daily-tile-val" id="dailyFinalStreak">—</div>
+                </div>
+            </div>
+            <button class="overlay-btn primary" onclick="game.closeDailyComplete()">Continue</button>
+            <div style="margin-top:12px">
+                <button class="share-btn" onclick="game.shareDailyScore()">📋 Share Result</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>GitLines</h1>
-            <div id="status" style="display:none"></div>
+            <div class="tagline">Memory · Pattern · Precision</div>
         </div>
+
+        <!-- Mode Switcher -->
+        <div class="mode-switcher">
+            <button class="mode-btn active" id="normalModeBtn" onclick="game.setMode('normal')">Classic</button>
+            <button class="mode-btn" id="dailyModeBtn" onclick="game.setMode('daily')">☀️ Daily</button>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <!-- Lives -->
+            <div class="stat-block">
+                <div class="stat-label">Lives</div>
+                <div class="lives-display" id="livesDisplay">
+                    <span class="heart" id="heart0">♥</span>
+                    <span class="heart" id="heart1">♥</span>
+                    <span class="heart" id="heart2">♥</span>
+                </div>
+            </div>
+
+            <!-- Score -->
+            <div class="stat-block">
+                <div class="stat-label">Score</div>
+                <div class="stat-value green" id="scoreDisplay">0</div>
+            </div>
+
+            <!-- Level -->
+            <div class="stat-block">
+                <div class="stat-label">Level</div>
+                <div class="stat-value" id="levelDisplay">1</div>
+            </div>
+
+            <!-- Streak -->
+            <div class="stat-block streak-display">
+                <div class="stat-label">Streak</div>
+                <div style="display:flex;align-items:center;gap:3px">
+                    <span class="streak-fire" id="streakFire"></span>
+                    <div class="stat-value gold" id="streakDisplay">0</div>
+                </div>
+            </div>
+
+            <!-- High Score -->
+            <div class="stat-block">
+                <div class="stat-label">Best</div>
+                <div class="stat-value gold" id="highScoreDisplay">0</div>
+            </div>
+        </div>
+
+        <div class="status-line" id="statusLine"></div>
 
         <div class="grid-container" id="gridContainer">
             <svg class="lines" id="svgLines">
                 <defs>
                     <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                        <stop offset="0%" style="stop-color:#09ff00;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#00a300;stop-opacity:1" />
                     </linearGradient>
                 </defs>
             </svg>
             <div class="grid" id="grid"></div>
         </div>
 
-        <button class="hint-btn" id="hintBtn" onclick="game.showHint()">Show Pattern</button>
+        <div class="controls">
+            <button class="hint-btn" id="hintBtn" onclick="game.showHint()">Show Pattern</button>
+            <button class="daily-btn" id="dailyBtn" style="display:none" onclick="game.setMode('daily')">☀️ Daily</button>
+        </div>
     </div>
 
-    <!-- ===== HOW TO PLAY SECTION ===== -->
-<!--     <div class="how-to-play">
-        <h3>How to Play</h3>
-        <p>👁️ <strong>Watch</strong> the pattern light up > ✋ <strong>Trace</strong> it by connecting adjacent dots > 🎯 <strong>Complete</strong> the sequence to level up > 🧠 <strong>Challenge</strong> yourself as grids get bigger!</p>
-    </div> -->
-
-    <!-- ===== FOOTER ===== -->
     <footer>
-        <p>Created by <a href="https://github.com/TheJoshCode">TheJoshCode</a>●<a href="privacy.html">Privacy Policy</a>●<a href="terms.html">Terms of Service</a></p>
+        <a href="/privacy">Privacy</a>
+        <a href="/terms">Terms</a>
     </footer>
 
     <script>
-        class GitLines {
-            constructor() {
-                this._failureTimeout = null;
-                this.level = 1;
-                this.baseSize = 3;
-                this.gridSize = this.baseSize;
-                this.dots = [];
-                this.targetPattern = [];
-                this.currentPattern = [];
-                this.isDrawing = false;
-                this.isComplete = false;
-                this.showingIntro = false;
-                this._introTimeouts = null;
-                this._hintTimeouts = null;
-
-                this.levelsPerGrid = 5;
-
-                this.grid = document.getElementById('grid');
-                this.svg = document.getElementById('svgLines');
-                this.status = document.getElementById('status');
-                this.hintBtn = document.getElementById('hintBtn');
-                this.flash = document.getElementById('flash');
-                this.gridContainer = document.getElementById('gridContainer');
-
-                this.init();
+    // ===== WEB AUDIO ENGINE =====
+    const AudioEngine = {
+        ctx: null,
+        init() {
+            if (!this.ctx) {
+                try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
             }
-
-            init() {
-                this.generateLevel();
-                this.setupEvents();
-            }
-
-            generateLevel() {
-                if (this.showingIntro) {
-                    this.cancelIntroPattern();
-                }
-                if (this._hintTimeouts) {
-                    this._hintTimeouts.forEach(id => clearTimeout(id));
-                    this._hintTimeouts = null;
-                }
-                
-                this.gridSize = this.baseSize + Math.floor((this.level - 1) / this.levelsPerGrid);
-                this.createGrid();
-                this.generatePattern();
-                this.showIntroPattern();
-            }
-
-            createGrid() {
-                this.grid.innerHTML = '';
-                this.svg.innerHTML = `
-                    <defs>
-                        <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                `;
-
-                this.grid.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
-                this.grid.style.gridTemplateRows = `repeat(${this.gridSize}, 1fr)`;
-
-                this.dots = [];
-                for (let i = 0; i < this.gridSize * this.gridSize; i++) {
-                    const dot = document.createElement('div');
-                    dot.className = 'dot';
-                    dot.dataset.index = i;
-                    this.grid.appendChild(dot);
-                    this.dots.push({
-                        el: dot,
-                        index: i,
-                        row: Math.floor(i / this.gridSize),
-                        col: i % this.gridSize
-                    });
-                }
-            }
-
-            generatePattern() {
-                const totalDots = this.gridSize * this.gridSize;
-                let attempts = 0;
-                let success = false;
-
-                while (!success && attempts < 100) {
-                    this.targetPattern = [];
-                    const used = new Set();
-                    const corners = [0, this.gridSize - 1, totalDots - this.gridSize, totalDots - 1];
-                    const start = corners[Math.floor(Math.random() * corners.length)];
-                    success = this.findHamiltonianPath(start, used, totalDots);
-                    attempts++;
-                }
-
-                if (this.targetPattern.length < totalDots) {
-                    this.generateSnakePattern();
-                }
-
-                this.currentPattern = [];
-                this.isComplete = false;
-            }
-
-            findHamiltonianPath(current, used, targetLength) {
-                this.targetPattern.push(current);
-                used.add(current);
-
-                if (this.targetPattern.length === targetLength) return true;
-
-                const currentDot = this.dots[current];
-                const neighbors = this.dots.filter(d => {
-                    if (used.has(d.index)) return false;
-                    const rowDiff = Math.abs(d.row - currentDot.row);
-                    const colDiff = Math.abs(d.col - currentDot.col);
-                    return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
-                });
-
-                for (let i = neighbors.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [neighbors[i], neighbors[j]] = [neighbors[j], neighbors[i]];
-                }
-
-                for (const neighbor of neighbors) {
-                    if (this.findHamiltonianPath(neighbor.index, used, targetLength)) return true;
-                }
-
-                this.targetPattern.pop();
-                used.delete(current);
-                return false;
-            }
-
-            generateSnakePattern() {
-                this.targetPattern = [];
-                for (let row = 0; row < this.gridSize; row++) {
-                    if (row % 2 === 0) {
-                        for (let col = 0; col < this.gridSize; col++) this.targetPattern.push(row * this.gridSize + col);
-                    } else {
-                        for (let col = this.gridSize - 1; col >= 0; col--) this.targetPattern.push(row * this.gridSize + col);
-                    }
-                }
-            }
-
-            showIntroPattern() {
-                this.showingIntro = true;
-                this.hintBtn.disabled = true;
-                
-                this.clearLines();
-                this.svg.querySelectorAll('.target-line').forEach(line => line.remove());
-                this.dots.forEach(d => d.el.classList.remove('target', 'revealed', 'error'));
-                
-                this._introTimeouts = [];
-                
-                const containerRect = this.grid.getBoundingClientRect();
-                const stepDelay = 100;
-                
-                const lineElements = [];
-                for (let i = 0; i < this.targetPattern.length - 1; i++) {
-                    const from = this.dots[this.targetPattern[i]];
-                    const to = this.dots[this.targetPattern[i + 1]];
-                    
-                    const fromRect = from.el.getBoundingClientRect();
-                    const toRect = to.el.getBoundingClientRect();
-                    
-                    const x1 = fromRect.left + fromRect.width / 2 - containerRect.left;
-                    const y1 = fromRect.top + fromRect.height / 2 - containerRect.top;
-                    const x2 = toRect.left + toRect.width / 2 - containerRect.left;
-                    const y2 = toRect.top + toRect.height / 2 - containerRect.top;
-                    
-                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    path.setAttribute('d', `M ${x1} ${y1} L ${x2} ${y2}`);
-                    path.setAttribute('class', 'target-line');
-                    path.style.opacity = '0';
-                    path.style.transition = 'opacity 0.2s ease';
-                    this.svg.appendChild(path);
-                    lineElements.push(path);
-                }
-                
-                const animateStep = (i) => {
-                    if (i >= this.targetPattern.length) {
-                        const cleanupTimeout = setTimeout(() => {
-                            this.dots.forEach(d => d.el.classList.remove('target', 'revealed', 'error'));
-                            this.svg.querySelectorAll('.target-line').forEach(line => line.remove());
-                            this.clearLines();
-                            this.hintBtn.disabled = false;
-                            this.showingIntro = false;
-                            this._introTimeouts = null;
-                        }, 1500);
-                        this._introTimeouts.push(cleanupTimeout);
-                        return;
-                    }
-                    
-                    this.dots[this.targetPattern[i]].el.classList.add('target', 'revealed');
-                    
-                    if (i > 0 && lineElements[i - 1]) {
-                        lineElements[i - 1].style.opacity = '0.8';
-                    }
-                    
-                    const nextTimeout = setTimeout(() => animateStep(i + 1), stepDelay);
-                    this._introTimeouts.push(nextTimeout);
-                };
-                
-                animateStep(0);
-            }
+            if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+        },
+        tone(freq, type = 'sine', duration = 0.12, vol = 0.15, delay = 0) {
+            if (!this.ctx) return;
+            try {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime + delay);
+                gain.gain.setValueAtTime(0, this.ctx.currentTime + delay);
+                gain.gain.linearRampToValueAtTime(vol, this.ctx.currentTime + delay + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + delay + duration);
+                osc.start(this.ctx.currentTime + delay);
+                osc.stop(this.ctx.currentTime + delay + duration + 0.05);
+            } catch(e) {}
+        },
+        
+        // 🎵 NEW: Exponential pitch based on puzzle progress
+        dotTapProgress(progress) {
+            this.init();
+            const startFreq = 196;   // G3 - low starting pitch
+            const endFreq = 1175;    // D6 - high ending pitch
             
-            cancelIntroPattern() {
-                if (this._introTimeouts) {
-                    this._introTimeouts.forEach(id => clearTimeout(id));
-                    this._introTimeouts = null;
+            // Exponential curve: smooth rise that accelerates toward the end
+            const freq = startFreq * Math.pow(endFreq / startFreq, progress);
+            
+            // Slightly shorter duration as progress increases for snappier end feedback
+            const duration = 0.14 - (progress * 0.06); // 0.14s → 0.08s
+            
+            const volume = 0.10 + (progress * 0.05); // 0.10 → 0.15
+            this.tone(freq, 'sine', duration, volume);
+        },
+        
+        // Keep original for fallback compatibility
+        dotTap(index) {
+            this.dotTapProgress(0.5); // Default middle pitch if called without progress
+        },
+        
+        success() {
+            this.init();
+            [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 'sine', 0.15, 0.1, i * 0.08));
+        },
+        failure() {
+            this.init();
+            this.tone(180, 'sawtooth', 0.25, 0.15);
+            this.tone(120, 'sawtooth', 0.2, 0.1, 0.1);
+        },
+        streak() {
+            this.init();
+            [800, 1000, 1200].forEach((f, i) => this.tone(f, 'sine', 0.1, 0.08, i * 0.06));
+        },
+        gameOver() {
+            this.init();
+            [220, 180, 140, 110].forEach((f, i) => this.tone(f, 'sawtooth', 0.3, 0.12, i * 0.12));
+        },
+        milestone() {
+            this.init();
+            [523, 659, 784, 880, 1047].forEach((f, i) => this.tone(f, 'triangle', 0.18, 0.1, i * 0.07));
+        },
+        lostLife() {
+            this.init();
+            this.tone(300, 'sawtooth', 0.15, 0.2);
+            this.tone(200, 'sawtooth', 0.2, 0.15, 0.1);
+        }
+    };
+
+    // ===== DAILY SEED GENERATOR =====
+    function getDailySeed() {
+        const now = new Date();
+        return `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+    }
+
+    function seededRandom(seed) {
+        let h = 0;
+        for (let i = 0; i < seed.length; i++) {
+            h = Math.imul(31, h) + seed.charCodeAt(i) | 0;
+        }
+        return function() {
+            h = Math.imul(h ^ h >>> 16, 0x45d9f3b) | 0;
+            h = Math.imul(h ^ h >>> 16, 0x45d9f3b) | 0;
+            return ((h ^ h >>> 16) >>> 0) / 4294967296;
+        };
+    }
+
+    // ===== MAIN GAME CLASS =====
+    class GitLines {
+        constructor() {
+            this._failureTimeout = null;
+            this.level = 1;
+            this.baseSize = 3;
+            this.gridSize = this.baseSize;
+            this.dots = [];
+            this.targetPattern = [];
+            this.currentPattern = [];
+            this.isDrawing = false;
+            this.isComplete = false;
+            this.showingIntro = false;
+            this._introTimeouts = null;
+            this._hintTimeouts = null;
+
+            this.levelsPerGrid = 5;
+
+            // New state
+            this.lives = 3;
+            this.maxLives = 3;
+            this.score = 0;
+            this.highScore = parseInt(localStorage.getItem('gitlines_highscore') || '0');
+            this.streak = 0;
+            this.bestStreak = 0;
+            this.mode = 'normal'; // 'normal' | 'daily'
+            this.dailyCompleted = false;
+            this.dailySeed = getDailySeed();
+            this.dailyRng = null;
+            this.dailyErrors = 0;
+            this.dailyLevel = 0;
+            this.gameActive = false;
+
+            // Elements
+            this.grid = document.getElementById('grid');
+            this.svg = document.getElementById('svgLines');
+            this.hintBtn = document.getElementById('hintBtn');
+            this.flash = document.getElementById('flash');
+            this.gridContainer = document.getElementById('gridContainer');
+            this.scoreDisplay = document.getElementById('scoreDisplay');
+            this.levelDisplay = document.getElementById('levelDisplay');
+            this.streakDisplay = document.getElementById('streakDisplay');
+            this.streakFire = document.getElementById('streakFire');
+            this.highScoreDisplay = document.getElementById('highScoreDisplay');
+            this.statusLine = document.getElementById('statusLine');
+
+            this.highScoreDisplay.textContent = this.highScore;
+
+            // Check daily completion
+            const savedDaily = localStorage.getItem('gitlines_daily_' + this.dailySeed);
+            if (savedDaily) this.dailyCompleted = true;
+
+            this.init();
+        }
+
+        init() {
+            this.gameActive = true;
+            this.generateLevel();
+            this.setupEvents();
+            this.updateUI();
+        }
+
+        setMode(mode) {
+            if (mode === this.mode) return;
+            this.mode = mode;
+
+            document.getElementById('normalModeBtn').classList.toggle('active', mode === 'normal');
+            document.getElementById('dailyModeBtn').classList.toggle('active', mode === 'daily');
+
+            if (mode === 'daily') {
+                this.dailyRng = seededRandom(this.dailySeed);
+                if (this.dailyCompleted) {
+                    this.setStatus('☀️ Already completed today!');
+                    setTimeout(() => this.setMode('normal'), 2000);
+                    return;
                 }
-                this.dots.forEach(d => d.el.classList.remove('target', 'revealed', 'error'));
-                this.svg.querySelectorAll('.target-line').forEach(line => line.remove());
-                this.clearLines();
-                this.hintBtn.disabled = false;
-                this.showingIntro = false;
+                this.dailyErrors = 0;
+                this.dailyLevel = 0;
             }
 
-            setupEvents() {
-                const container = document.getElementById('gridContainer');
+            this.restartGame();
+        }
 
-                const getDotFromEvent = (e) => {
-                    const touch = e.touches ? e.touches[0] : e;
-                    const el = document.elementFromPoint(touch.clientX, touch.clientY);
-                    return el?.closest('.dot');
-                };
-                const start = (e) => {
-                    if (this.isComplete || this.showingIntro) return;
-                    e.preventDefault();
-                    
-                    if (this._failureTimeout) {
-                        clearTimeout(this._failureTimeout);
-                        this._failureTimeout = null;
-                    }
-
-                    this.isDrawing = true;
-                    this.currentPattern = [];
-                    this.clearLines();
-
-                    const dot = getDotFromEvent(e);
-                    if (dot) this.addToPattern(parseInt(dot.dataset.index));
-                };
-                const move = (e) => {
-                    if (!this.isDrawing || this.isComplete || this.showingIntro) return;
-                    e.preventDefault();
-
-                    const dot = getDotFromEvent(e);
-                    if (dot) {
-                        const index = parseInt(dot.dataset.index);
-                        
-                        if (this.currentPattern.length > 1 && index === this.currentPattern[this.currentPattern.length - 2]) {
-                            const lastIndex = this.currentPattern.pop();
-                            this.dots[lastIndex].el.classList.remove('active', 'error');
-                            this.drawLines();
-                            return;
-                        }
-
-                        if (!this.currentPattern.includes(index)) {
-                            if (this.isValidMove(index)) {
-                                this.addToPattern(index);
-                            }
-                        }
-                    }
-                };
-
-                const end = (e) => {
-                    if (!this.isDrawing) return;
-                    this.isDrawing = false;
-                    this.checkPattern();
-                };
-
-                container.addEventListener('mousedown', start);
-                container.addEventListener('mousemove', move);
-                container.addEventListener('mouseup', end);
-                container.addEventListener('mouseleave', end);
-                container.addEventListener('touchstart', start, { passive: false });
-                container.addEventListener('touchmove', move, { passive: false });
-                container.addEventListener('touchend', end);
-                window.addEventListener('resize', () => {
-                    if (this.isDrawing && !this.isComplete) {
-                        this.drawLines();
-                    }
-                });
+        restartGame() {
+            document.getElementById('gameOverOverlay').classList.remove('visible');
+            this.level = 1;
+            this.lives = this.maxLives;
+            this.score = 0;
+            this.streak = 0;
+            this.bestStreak = 0;
+            this.gameActive = true;
+            this.dailyErrors = 0;
+            this.dailyLevel = 0;
+            if (this.mode === 'daily') {
+                this.dailyRng = seededRandom(this.dailySeed);
             }
+            this.updateUI();
+            this.generateLevel();
+        }
 
-            isValidMove(index) {
-                if (this.currentPattern.length === 0) return true;
-                const lastIndex = this.currentPattern[this.currentPattern.length - 1];
-                const lastDot = this.dots[lastIndex];
-                const newDot = this.dots[index];
-                const rowDiff = Math.abs(newDot.row - lastDot.row);
-                const colDiff = Math.abs(newDot.col - lastDot.col);
-                return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
-            }
+        updateUI() {
+            this.scoreDisplay.textContent = this.score;
+            this.levelDisplay.textContent = this.level;
+            this.streakDisplay.textContent = this.streak;
+            this.highScoreDisplay.textContent = this.highScore;
+            this.streakFire.textContent = this.streak >= 3 ? '🔥' : '';
+            this.updateLives();
+        }
 
-            addToPattern(index) {
-                this.currentPattern.push(index);
-                this.dots[index].el.classList.add('active');
-                this.drawLines();
-                
-                if (this.currentPattern.length === this.targetPattern.length) {
-                    this.isDrawing = false;
-                    this.checkPattern();
-                }
-            }
-
-            drawLines() {
-                this.svg.querySelectorAll('path.line').forEach(line => line.remove());
-                if (this.currentPattern.length < 2) return;
-                const containerRect = this.grid.getBoundingClientRect();
-                for (let i = 0; i < this.currentPattern.length - 1; i++) {
-                    const from = this.dots[this.currentPattern[i]];
-                    const to = this.dots[this.currentPattern[i + 1]];
-                    const fromRect = from.el.getBoundingClientRect();
-                    const toRect = to.el.getBoundingClientRect();
-                    const x1 = fromRect.left + fromRect.width / 2 - containerRect.left;
-                    const y1 = fromRect.top + fromRect.height / 2 - containerRect.top;
-                    const x2 = toRect.left + toRect.width / 2 - containerRect.left;
-                    const y2 = toRect.top + toRect.height / 2 - containerRect.top;
-                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    path.setAttribute('d', `M ${x1} ${y1} L ${x2} ${y2}`);
-                    path.setAttribute('class', 'line');
-                    path.setAttribute('stroke', 'url(#lineGrad)');
-                    this.svg.appendChild(path);
-                }
-            }
-
-            clearLines() {
-                this.svg.querySelectorAll('path.line').forEach(line => line.remove());
-                this.dots.forEach(d => d.el.classList.remove('active', 'error'));
-            }
-
-            checkPattern() {
-                if (this.arraysEqual(this.currentPattern, this.targetPattern)) {
-                    this.onSuccess();
-                } else {
-                    this.onFailure();
-                }
-            }
-
-            vibrate(pattern) {
-                if ('vibrate' in navigator) {
-                    navigator.vibrate(pattern);
-                }
-            }
-
-            onSuccess() {
-                this.isComplete = true;
-                
-                // Green flash for success
-                this.flash.className = 'flash success show';
-                setTimeout(() => this.flash.classList.remove('show'), 150);
-                
-                // Vibrate once on mobile for success
-                this.vibrate(50);
-                
-                this.createParticles();
-                setTimeout(() => { this.level++; this.generateLevel(); }, 1500);
-            }
-
-            onFailure() {
-                // Red flash for error
-                this.flash.className = 'flash error show';
-                setTimeout(() => this.flash.classList.remove('show'), 200);
-                
-                // Turn lines and dots red
-                this.svg.querySelectorAll('path.line').forEach(p => p.classList.add('error'));
-                this.currentPattern.forEach(idx => {
-                    this.dots[idx].el.classList.add('error');
-                });
-                
-                // Screen shake
-                this.gridContainer.classList.add('shake');
-                setTimeout(() => this.gridContainer.classList.remove('shake'), 400);
-                
-                // Vibrate twice on mobile for error
-                this.vibrate([30, 50, 30]);
-                
-                this._failureTimeout = setTimeout(() => { 
-                    this.currentPattern = []; 
-                    this.clearLines(); 
-                    this._failureTimeout = null;
-                }, 800);
-            }
-
-            showHint() {
-                if (this.isComplete || this.showingIntro) return;
-                this.hintBtn.disabled = true;
-                
-                if (this._hintTimeouts) {
-                    this._hintTimeouts.forEach(id => clearTimeout(id));
-                }
-                this._hintTimeouts = [];
-                this.dots.forEach(d => d.el.classList.remove('target', 'revealed', 'error'));
-                
-                const stepDelay = 100;
-                
-                const animateHintStep = (i) => {
-                    if (i >= this.targetPattern.length) {
-                        const cleanupTimeout = setTimeout(() => {
-                            this.dots.forEach(d => d.el.classList.remove('target', 'revealed', 'error'));
-                            this.hintBtn.disabled = false;
-                            this._hintTimeouts = null;
-                        }, 1000);
-                        this._hintTimeouts.push(cleanupTimeout);
-                        return;
-                    }
-                    
-                    this.dots[this.targetPattern[i]].el.classList.add('target', 'revealed');
-                    const nextTimeout = setTimeout(() => animateHintStep(i + 1), stepDelay);
-                    this._hintTimeouts.push(nextTimeout);
-                };
-                
-                animateHintStep(0);
-            }
-
-            createParticles() {
-                const centerX = window.innerWidth / 2;
-                const centerY = window.innerHeight / 2;
-                for (let i = 0; i < 20; i++) {
-                    const particle = document.createElement('div');
-                    particle.className = 'particle';
-                    particle.style.left = centerX + 'px';
-                    particle.style.top = centerY + 'px';
-                    const angle = (Math.PI * 2 * i) / 20;
-                    const distance = 100 + Math.random() * 100;
-                    particle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
-                    particle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
-                    document.body.appendChild(particle);
-                    setTimeout(() => particle.remove(), 1000);
-                }
-            }
-
-            arraysEqual(a, b) {
-                if (a.length !== b.length) return false;
-                return a.every((val, i) => val === b[i]);
+        updateLives() {
+            for (let i = 0; i < this.maxLives; i++) {
+                const h = document.getElementById('heart' + i);
+                if (h) h.className = 'heart' + (i >= this.lives ? ' lost' : '');
             }
         }
 
-        const game = new GitLines();
+        setStatus(msg) {
+            this.statusLine.textContent = msg;
+        }
+
+        // ===== LEVEL GENERATION =====
+        generateLevel() {
+            if (!this.gameActive) return;
+            if (this.showingIntro) this.cancelIntroPattern();
+            if (this._hintTimeouts) {
+                this._hintTimeouts.forEach(id => clearTimeout(id));
+                this._hintTimeouts = null;
+            }
+
+            this.gridSize = this.baseSize + Math.floor((this.level - 1) / this.levelsPerGrid);
+            this.createGrid();
+            this.generatePattern();
+            this.showIntroPattern();
+            this.levelDisplay.textContent = this.level;
+            this.setStatus(`Level ${this.level} — ${this.gridSize}×${this.gridSize} grid`);
+        }
+
+        createGrid() {
+            this.grid.innerHTML = '';
+            this.svg.innerHTML = `
+                <defs>
+                    <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#09ff00;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#00a300;stop-opacity:1" />
+                    </linearGradient>
+                </defs>`;
+            this.grid.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
+            this.grid.style.gridTemplateRows = `repeat(${this.gridSize}, 1fr)`;
+            this.dots = [];
+            for (let i = 0; i < this.gridSize * this.gridSize; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dot.dataset.index = i;
+                this.grid.appendChild(dot);
+                this.dots.push({ el: dot, index: i, row: Math.floor(i / this.gridSize), col: i % this.gridSize });
+            }
+        }
+
+        rng() {
+            if (this.mode === 'daily' && this.dailyRng) return this.dailyRng();
+            return Math.random();
+        }
+
+        generatePattern() {
+            const totalDots = this.gridSize * this.gridSize;
+            let attempts = 0, success = false;
+            while (!success && attempts < 100) {
+                this.targetPattern = [];
+                const used = new Set();
+                const corners = [0, this.gridSize - 1, totalDots - this.gridSize, totalDots - 1];
+                const start = corners[Math.floor(this.rng() * corners.length)];
+                success = this.findHamiltonianPath(start, used, totalDots);
+                attempts++;
+            }
+            if (this.targetPattern.length < totalDots) this.generateSnakePattern();
+            this.currentPattern = [];
+            this.isComplete = false;
+        }
+
+        findHamiltonianPath(current, used, targetLength) {
+            this.targetPattern.push(current);
+            used.add(current);
+            if (this.targetPattern.length === targetLength) return true;
+            const currentDot = this.dots[current];
+            const neighbors = this.dots.filter(d => {
+                if (used.has(d.index)) return false;
+                const rd = Math.abs(d.row - currentDot.row);
+                const cd = Math.abs(d.col - currentDot.col);
+                return (rd === 1 && cd === 0) || (rd === 0 && cd === 1);
+            });
+            for (let i = neighbors.length - 1; i > 0; i--) {
+                const j = Math.floor(this.rng() * (i + 1));
+                [neighbors[i], neighbors[j]] = [neighbors[j], neighbors[i]];
+            }
+            for (const neighbor of neighbors) {
+                if (this.findHamiltonianPath(neighbor.index, used, targetLength)) return true;
+            }
+            this.targetPattern.pop();
+            used.delete(current);
+            return false;
+        }
+
+        generateSnakePattern() {
+            this.targetPattern = [];
+            for (let row = 0; row < this.gridSize; row++) {
+                if (row % 2 === 0) {
+                    for (let col = 0; col < this.gridSize; col++) this.targetPattern.push(row * this.gridSize + col);
+                } else {
+                    for (let col = this.gridSize - 1; col >= 0; col--) this.targetPattern.push(row * this.gridSize + col);
+                }
+            }
+        }
+
+        // ===== INTRO ANIMATION =====
+        showIntroPattern() {
+            this.showingIntro = true;
+            this.hintBtn.disabled = true;
+            this.clearLines();
+            this.svg.querySelectorAll('.target-line').forEach(l => l.remove());
+            this.dots.forEach(d => d.el.classList.remove('target', 'revealed', 'error'));
+            this._introTimeouts = [];
+
+            const containerRect = this.grid.getBoundingClientRect();
+            const stepDelay = Math.max(60, 120 - this.level * 3); // speeds up with level
+
+            const lineElements = [];
+            for (let i = 0; i < this.targetPattern.length - 1; i++) {
+                const from = this.dots[this.targetPattern[i]];
+                const to = this.dots[this.targetPattern[i + 1]];
+                const fromRect = from.el.getBoundingClientRect();
+                const toRect = to.el.getBoundingClientRect();
+                const x1 = fromRect.left + fromRect.width / 2 - containerRect.left;
+                const y1 = fromRect.top + fromRect.height / 2 - containerRect.top;
+                const x2 = toRect.left + toRect.width / 2 - containerRect.left;
+                const y2 = toRect.top + toRect.height / 2 - containerRect.top;
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', `M ${x1} ${y1} L ${x2} ${y2}`);
+                path.setAttribute('class', 'target-line');
+                path.style.opacity = '0';
+                path.style.transition = 'opacity 0.2s ease';
+                this.svg.appendChild(path);
+                lineElements.push(path);
+            }
+
+            const animateStep = (i) => {
+                if (i >= this.targetPattern.length) {
+                    const cleanupTimeout = setTimeout(() => {
+                        this.dots.forEach(d => d.el.classList.remove('target', 'revealed', 'error'));
+                        this.svg.querySelectorAll('.target-line').forEach(l => l.remove());
+                        this.clearLines();
+                        this.hintBtn.disabled = false;
+                        this.showingIntro = false;
+                        this._introTimeouts = null;
+                        this.setStatus('Trace the pattern!');
+                    }, 1200);
+                    this._introTimeouts.push(cleanupTimeout);
+                    return;
+                }
+                this.dots[this.targetPattern[i]].el.classList.add('target', 'revealed');
+                if (i > 0 && lineElements[i - 1]) lineElements[i - 1].style.opacity = '0.8';
+                const nextTimeout = setTimeout(() => animateStep(i + 1), stepDelay);
+                this._introTimeouts.push(nextTimeout);
+            };
+
+            animateStep(0);
+        }
+
+        cancelIntroPattern() {
+            if (this._introTimeouts) {
+                this._introTimeouts.forEach(id => clearTimeout(id));
+                this._introTimeouts = null;
+            }
+            this.dots.forEach(d => d.el.classList.remove('target', 'revealed', 'error'));
+            this.svg.querySelectorAll('.target-line').forEach(l => l.remove());
+            this.clearLines();
+            this.hintBtn.disabled = false;
+            this.showingIntro = false;
+        }
+
+        // ===== EVENTS =====
+        setupEvents() {
+            const container = document.getElementById('gridContainer');
+            const getDotFromEvent = (e) => {
+                const touch = e.touches ? e.touches[0] : e;
+                const el = document.elementFromPoint(touch.clientX, touch.clientY);
+                return el?.closest('.dot');
+            };
+
+            const start = (e) => {
+                if (this.isComplete || this.showingIntro || !this.gameActive) return;
+                e.preventDefault();
+                AudioEngine.init();
+                if (this._failureTimeout) { clearTimeout(this._failureTimeout); this._failureTimeout = null; }
+                this.isDrawing = true;
+                this.currentPattern = [];
+                this.clearLines();
+                const dot = getDotFromEvent(e);
+                if (dot) this.addToPattern(parseInt(dot.dataset.index));
+            };
+
+            const move = (e) => {
+                if (!this.isDrawing || this.isComplete || this.showingIntro) return;
+                e.preventDefault();
+                const dot = getDotFromEvent(e);
+                if (dot) {
+                    const index = parseInt(dot.dataset.index);
+                    if (this.currentPattern.length > 1 && index === this.currentPattern[this.currentPattern.length - 2]) {
+                        const lastIndex = this.currentPattern.pop();
+                        this.dots[lastIndex].el.classList.remove('active', 'error');
+                        this.drawLines();
+                        return;
+                    }
+                    if (!this.currentPattern.includes(index) && this.isValidMove(index)) {
+                        this.addToPattern(index);
+                    }
+                }
+            };
+
+            const end = (e) => {
+                if (!this.isDrawing) return;
+                this.isDrawing = false;
+                this.checkPattern();
+            };
+
+            container.addEventListener('mousedown', start);
+            container.addEventListener('mousemove', move);
+            container.addEventListener('mouseup', end);
+            container.addEventListener('mouseleave', end);
+            container.addEventListener('touchstart', start, { passive: false });
+            container.addEventListener('touchmove', move, { passive: false });
+            container.addEventListener('touchend', end);
+            window.addEventListener('resize', () => { if (this.isDrawing && !this.isComplete) this.drawLines(); });
+        }
+
+        isValidMove(index) {
+            if (this.currentPattern.length === 0) return true;
+            const lastIndex = this.currentPattern[this.currentPattern.length - 1];
+            const lastDot = this.dots[lastIndex];
+            const newDot = this.dots[index];
+            const rowDiff = Math.abs(newDot.row - lastDot.row);
+            const colDiff = Math.abs(newDot.col - lastDot.col);
+            return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
+        }
+
+        addToPattern(index) {
+            this.currentPattern.push(index);
+            this.dots[index].el.classList.add('active');
+            
+            // 🎵 Calculate progress for exponential pitch feedback
+            const progress = this.targetPattern.length > 0 
+                ? this.currentPattern.length / this.targetPattern.length 
+                : 0.5;
+            AudioEngine.dotTapProgress(progress);
+            
+            this.drawLines();
+            if (this.currentPattern.length === this.targetPattern.length) {
+                AudioEngine.tone(1319, 'sine', 0.2, 0.2);
+                this.isDrawing = false;
+                this.checkPattern();
+            }
+        }
+
+        drawLines() {
+            this.svg.querySelectorAll('path.line').forEach(l => l.remove());
+            if (this.currentPattern.length < 2) return;
+            const containerRect = this.grid.getBoundingClientRect();
+            for (let i = 0; i < this.currentPattern.length - 1; i++) {
+                const from = this.dots[this.currentPattern[i]];
+                const to = this.dots[this.currentPattern[i + 1]];
+                const fromRect = from.el.getBoundingClientRect();
+                const toRect = to.el.getBoundingClientRect();
+                const x1 = fromRect.left + fromRect.width / 2 - containerRect.left;
+                const y1 = fromRect.top + fromRect.height / 2 - containerRect.top;
+                const x2 = toRect.left + toRect.width / 2 - containerRect.left;
+                const y2 = toRect.top + toRect.height / 2 - containerRect.top;
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', `M ${x1} ${y1} L ${x2} ${y2}`);
+                path.setAttribute('class', 'line');
+                path.setAttribute('stroke', 'url(#lineGrad)');
+                this.svg.appendChild(path);
+            }
+        }
+
+        clearLines() {
+            this.svg.querySelectorAll('path.line').forEach(l => l.remove());
+            this.dots.forEach(d => d.el.classList.remove('active', 'error'));
+        }
+
+        checkPattern() {
+            if (this.arraysEqual(this.currentPattern, this.targetPattern)) {
+                this.onSuccess();
+            } else {
+                this.onFailure();
+            }
+        }
+
+        vibrate(pattern) { if ('vibrate' in navigator) navigator.vibrate(pattern); }
+
+        // ===== SUCCESS =====
+        onSuccess() {
+            this.isComplete = true;
+
+            // Score: base points + streak bonus + level multiplier
+            const base = this.gridSize * this.gridSize * 10;
+            const streakBonus = Math.min(this.streak, 10) * 5;
+            const levelMult = 1 + (this.level - 1) * 0.1;
+            const points = Math.round((base + streakBonus) * levelMult);
+            this.score += points;
+
+            // Streak
+            this.streak++;
+            if (this.streak > this.bestStreak) this.bestStreak = this.streak;
+
+            // High score
+            if (this.score > this.highScore) {
+                this.highScore = this.score;
+                localStorage.setItem('gitlines_highscore', this.highScore);
+            }
+
+            // Flash & sound
+            this.flash.className = 'flash success show';
+            setTimeout(() => this.flash.classList.remove('show'), 150);
+            AudioEngine.success();
+            this.vibrate(50);
+            this.createParticles();
+            this.updateUI();
+
+            // Streak popup at milestones
+            if (this.streak > 0 && this.streak % 3 === 0) {
+                this.showStreakPopup(this.streak);
+                AudioEngine.streak();
+            }
+
+            // Daily tracking
+            if (this.mode === 'daily') {
+                this.dailyLevel = this.level;
+            }
+
+            const nextLevel = this.level + 1;
+            const isMilestone = nextLevel % 5 === 1 && nextLevel > 1;
+
+            setTimeout(() => {
+                if (isMilestone) {
+                    this.showMilestone(nextLevel);
+                    AudioEngine.milestone();
+                    setTimeout(() => { this.level++; this.generateLevel(); }, 2000);
+                } else {
+                    this.level++;
+                    this.generateLevel();
+                }
+            }, isMilestone ? 300 : 1200);
+        }
+
+        // ===== FAILURE =====
+        onFailure() {
+            this.flash.className = 'flash error show';
+            setTimeout(() => this.flash.classList.remove('show'), 200);
+
+            this.svg.querySelectorAll('path.line').forEach(p => p.classList.add('error'));
+            this.currentPattern.forEach(idx => this.dots[idx].el.classList.add('error'));
+            this.gridContainer.classList.add('shake');
+            setTimeout(() => this.gridContainer.classList.remove('shake'), 400);
+
+            // Lose a life
+            this.lives--;
+            this.streak = 0;
+            if (this.mode === 'daily') this.dailyErrors++;
+
+            AudioEngine.failure();
+            this.vibrate([30, 50, 30]);
+
+            // Animate heart loss
+            const lostHeart = document.getElementById('heart' + this.lives);
+            if (lostHeart) {
+                AudioEngine.lostLife();
+                lostHeart.classList.add('losing');
+                setTimeout(() => { lostHeart.classList.remove('losing'); lostHeart.classList.add('lost'); }, 400);
+            }
+
+            this.updateUI();
+            this.setStatus(this.lives > 0 ? `${this.lives} ${this.lives === 1 ? 'life' : 'lives'} remaining` : 'Game over!');
+
+            if (this.lives <= 0) {
+                setTimeout(() => this.triggerGameOver(), 900);
+            } else {
+                this._failureTimeout = setTimeout(() => {
+                    this.currentPattern = [];
+                    this.clearLines();
+                    this._failureTimeout = null;
+                }, 800);
+            }
+        }
+
+        triggerGameOver() {
+            if (this.mode === 'daily') {
+                // Daily: save result and show daily overlay
+                localStorage.setItem('gitlines_daily_' + this.dailySeed, JSON.stringify({
+                    level: this.level, score: this.score, errors: this.dailyErrors, streak: this.bestStreak
+                }));
+                this.dailyCompleted = true;
+                this.showDailyComplete();
+                return;
+            }
+
+            AudioEngine.gameOver();
+            this.gameActive = false;
+
+            document.getElementById('finalLevel').textContent = this.level;
+            document.getElementById('finalScore').textContent = this.score;
+            document.getElementById('finalStreak').textContent = this.bestStreak;
+
+            const isNewRecord = this.score >= this.highScore && this.score > 0;
+            const hsEl = document.getElementById('finalHighScore');
+            hsEl.textContent = this.highScore;
+            if (isNewRecord) {
+                hsEl.className = 'overlay-stat-val new-record';
+                hsEl.innerHTML = this.highScore + '<span class="new-record-badge">NEW!</span>';
+            } else {
+                hsEl.className = 'overlay-stat-val';
+            }
+
+            document.getElementById('gameOverOverlay').classList.add('visible');
+        }
+
+        showDailyComplete() {
+            document.getElementById('dailyFinalLevel').textContent = this.level;
+            document.getElementById('dailyFinalScore').textContent = this.score;
+            document.getElementById('dailyFinalErrors').textContent = this.dailyErrors;
+            document.getElementById('dailyFinalStreak').textContent = this.bestStreak;
+            document.getElementById('dailyCompleteOverlay').classList.add('visible');
+        }
+
+        closeDailyComplete() {
+            document.getElementById('dailyCompleteOverlay').classList.remove('visible');
+            this.setMode('normal');
+        }
+
+        // ===== HINT =====
+        showHint() {
+            if (this.isComplete || this.showingIntro) return;
+            this.hintBtn.disabled = true;
+            if (this._hintTimeouts) { this._hintTimeouts.forEach(id => clearTimeout(id)); }
+            this._hintTimeouts = [];
+            this.dots.forEach(d => d.el.classList.remove('target', 'revealed', 'error'));
+            const stepDelay = 100;
+            const animateHintStep = (i) => {
+                if (i >= this.targetPattern.length) {
+                    const cleanupTimeout = setTimeout(() => {
+                        this.dots.forEach(d => d.el.classList.remove('target', 'revealed', 'error'));
+                        this.hintBtn.disabled = false;
+                        this._hintTimeouts = null;
+                    }, 1000);
+                    this._hintTimeouts.push(cleanupTimeout);
+                    return;
+                }
+                this.dots[this.targetPattern[i]].el.classList.add('target', 'revealed');
+                const nextTimeout = setTimeout(() => animateHintStep(i + 1), stepDelay);
+                this._hintTimeouts.push(nextTimeout);
+            };
+            animateHintStep(0);
+        }
+
+        // ===== POPUPS =====
+        showStreakPopup(streak) {
+            const popup = document.getElementById('streakPopup');
+            const emojis = ['🔥', '💥', '⚡', '🌟', '👑'];
+            const emoji = emojis[Math.min(Math.floor(streak / 3) - 1, emojis.length - 1)];
+            document.getElementById('streakPopupTitle').textContent = `${emoji} ${streak} Streak!`;
+            popup.classList.add('show');
+            setTimeout(() => popup.classList.remove('show'), 1800);
+        }
+
+        showMilestone(level) {
+            const popup = document.getElementById('milestonePopup');
+            const newGrid = this.baseSize + Math.floor((level - 1) / this.levelsPerGrid);
+            const current = this.baseSize + Math.floor((level - 2) / this.levelsPerGrid);
+            document.getElementById('milestoneTitle').textContent = `⚡ LEVEL ${level}!`;
+            popup.querySelector('.milestone-sub').textContent = newGrid > current ? `Grid expanded to ${newGrid}×${newGrid}` : 'Keep going!';
+            popup.classList.add('show');
+            setTimeout(() => popup.classList.remove('show'), 2000);
+        }
+
+        // ===== PARTICLES =====
+        createParticles() {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            for (let i = 0; i < 24; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = centerX + 'px';
+                particle.style.top = centerY + 'px';
+                const angle = (Math.PI * 2 * i) / 24;
+                const distance = 80 + Math.random() * 120;
+                particle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+                particle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+                const colors = ['#09ff00', '#5dff4b', '#ffffff', '#00ff88', '#ffff00'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        // ===== SHARE =====
+        shareScore() {
+            const text = `🎮 GitLines\nLevel: ${this.level} | Score: ${this.score}\nStreak: ${this.bestStreak} | Best: ${this.highScore}\nCan you beat me? gitlines.app`;
+            navigator.clipboard?.writeText(text).then(() => {
+                const btn = document.querySelector('.share-btn');
+                if (btn) { btn.textContent = '✅ Copied!'; setTimeout(() => btn.textContent = '📋 Copy Score', 2000); }
+            });
+        }
+
+        shareDailyScore() {
+            const date = new Date();
+            const dateStr = `${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()}`;
+            const hearts = '♥'.repeat(this.lives) + '♡'.repeat(this.maxLives - this.lives);
+            const text = `☀️ GitLines Daily — ${dateStr}\nLevel: ${this.dailyLevel} | Score: ${this.score}\nErrors: ${this.dailyErrors} | Streak: ${this.bestStreak}\n${hearts}\ngitlines.app`;
+            navigator.clipboard?.writeText(text).then(() => {
+                const btns = document.querySelectorAll('.share-btn');
+                btns.forEach(btn => { btn.textContent = '✅ Copied!'; setTimeout(() => btn.textContent = '📋 Share Result', 2000); });
+            });
+        }
+
+        arraysEqual(a, b) {
+            if (a.length !== b.length) return false;
+            return a.every((val, i) => val === b[i]);
+        }
+    }
+
+    const game = new GitLines();
     </script>
 </body>
 </html>
