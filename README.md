@@ -1,3 +1,3 @@
-<img width="434" height="740" alt="image" src="https://github.com/user-attachments/assets/0b74b5c3-d04f-4c5b-82d1-2d438ef36bf4" />
+![gitlinesgif](https://github.com/user-attachments/assets/6bbf1289-6430-41c6-9509-1f35833ffe46)
 
 # GO TO https://thejoshcode.github.io/GitLines/ TO PLAY
