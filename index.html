@@ -36,15 +36,22 @@
             user-select: none;
         }
 
+        html, body {
+            height: 100%;
+        }
+
         body {
             background: #000;
-            min-height: 100vh;
+            min-height: 100%;
+            /* Use dvh so the game fits within the actual visible viewport on mobile */
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             font-family: 'Space Mono', monospace;
             overflow-x: hidden;
+            overflow-y: auto;
             position: relative;
         }
 
@@ -108,9 +115,10 @@
         .ad-mobile {
             display: flex;
             width: 100%;
-            max-width: 400px;
-            margin: 10px 0;
-            height: 90px;
+            max-width: 420px;
+            /* Fixed height for the ad banner — no taller */
+            height: 60px;
+            flex-shrink: 0;
         }
         .ad-mobile-top { order: -1; }
         .ad-mobile-bottom { order: 999; }
@@ -124,38 +132,47 @@
             .ad-desktop-right { right: 10px; }
             .ad-desktop { width: 120px; height: 500px; }
         }
-        @media (max-width: 480px) {
-            .ad-mobile { height: 70px; margin: 5px 0; }
-            .ad-placeholder { font-size: 0.65rem; padding: 4px; }
-        }
         @media (max-width: 767px) {
             .container { z-index: 60; position: relative; }
         }
         /* ===== END AD STYLES ===== */
 
+        /* ===== MAIN LAYOUT ===== */
+        /* On mobile we want the whole game to fit in one screen.
+           We use a flex column that fills the viewport, then let the
+           grid-container expand to fill remaining space. */
         .container {
             position: relative;
             width: 100%;
-            max-width: 400px;
-            padding: 0px;
+            max-width: 420px;
+            /* Padding so content never kisses the edges */
+            padding: 0 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
             z-index: 10;
+            /* On small screens, fill the viewport height and distribute space */
+            flex: 1 1 auto;
+            /* Limit the container height so it doesn't overflow the viewport */
+            max-height: 100dvh;
+            justify-content: center;
         }
 
         /* ===== HEADER ===== */
         .header {
             text-align: center;
-            margin-bottom: 8px;
+            /* Compact vertical space on small screens */
+            margin-bottom: clamp(2px, 1.2vh, 8px);
             width: 100%;
+            flex-shrink: 0;
         }
 
         h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.2rem;
+            /* Fluid font size: 1.5rem minimum, 2.2rem maximum */
+            font-size: clamp(1.4rem, 6vw, 2.2rem);
             font-weight: 900;
-            letter-spacing: 6px;
+            letter-spacing: clamp(2px, 1.5vw, 6px);
             color: var(--green);
             text-shadow: 
                 0 0 20px var(--green-glow),
@@ -164,8 +181,8 @@
         }
 
         .tagline {
-            font-size: 0.6rem;
-            letter-spacing: 3px;
+            font-size: clamp(0.48rem, 1.5vw, 0.6rem);
+            letter-spacing: clamp(1px, 0.8vw, 3px);
             color: var(--text-dim);
             text-transform: uppercase;
         }
@@ -176,11 +193,13 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            padding: 10px 14px;
+            padding: clamp(6px, 1.5vh, 10px) clamp(8px, 3vw, 14px);
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
             border-radius: 10px;
-            margin-bottom: 8px;
+            margin-bottom: clamp(4px, 1vh, 8px);
+            flex-shrink: 0;
+            gap: 4px;
         }
 
         .stat-block {
@@ -188,20 +207,24 @@
             flex-direction: column;
             align-items: center;
             gap: 2px;
+            min-width: 0;
+            flex: 1;
         }
 
         .stat-label {
-            font-size: 0.55rem;
-            letter-spacing: 2px;
+            font-size: clamp(0.42rem, 1.3vw, 0.55rem);
+            letter-spacing: clamp(0.5px, 0.5vw, 2px);
             color: var(--text-dim);
             text-transform: uppercase;
+            white-space: nowrap;
         }
 
         .stat-value {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
+            font-size: clamp(0.75rem, 3.5vw, 1.1rem);
             font-weight: 700;
             color: var(--text);
+            white-space: nowrap;
         }
 
         .stat-value.green { color: var(--green); text-shadow: 0 0 10px var(--green-glow); }
@@ -210,12 +233,12 @@
         /* Lives display */
         .lives-display {
             display: flex;
-            gap: 5px;
+            gap: clamp(2px, 1vw, 5px);
             align-items: center;
         }
 
         .heart {
-            font-size: 1.1rem;
+            font-size: clamp(0.75rem, 3vw, 1.1rem);
             transition: all 0.3s ease;
             filter: drop-shadow(0 0 4px rgba(255,68,68,0.6));
             color: #ff0000;
@@ -276,16 +299,30 @@
         .grid-container {
             position: relative;
             width: 100%;
+            /* 
+             * Key fix: use min() so the grid never exceeds the viewport width
+             * AND never takes more than a calculated portion of the viewport height.
+             * The calc reserves space for header (~60px), stats (~60px), 
+             * mode switcher (~40px), status (~24px), controls (~50px), footer (~44px),
+             * ads (~60px), and some breathing room (~30px).
+             * Total overhead ≈ 368px on phones; we subtract that from 100dvh.
+             */
             aspect-ratio: 1;
-            margin: 8px 0;
+            max-width: min(100%, calc(100dvh - 368px));
+            flex-shrink: 1;
+            /* Small vertical margin */
+            margin: clamp(4px, 1vh, 10px) 0;
+            /* Ensure a minimum playable size */
+            min-width: 180px;
         }
 
         .grid {
             position: absolute;
             inset: 0;
             display: grid;
-            gap: 20px;
-            padding: 20px;
+            /* Fluid gap and padding so dots scale correctly with container */
+            gap: clamp(8px, 2.5vw, 20px);
+            padding: clamp(8px, 2.5vw, 20px);
         }
 
         .dot {
@@ -298,6 +335,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            /* Ensure dots are always touchable */
+            min-width: 20px;
+            min-height: 20px;
         }
 
         .dot::before {
@@ -393,17 +433,18 @@
             gap: 10px;
             width: 100%;
             justify-content: center;
-            margin-top: 4px;
+            margin-top: clamp(2px, 0.8vh, 6px);
+            flex-shrink: 0;
         }
 
         .hint-btn {
-            padding: 10px 24px;
+            padding: clamp(8px, 1.5vh, 10px) clamp(14px, 4vw, 24px);
             background: linear-gradient(135deg, #0b7e00 0%, #11ff00 100%);
             border: none;
             color: #000;
             border-radius: 25px;
             cursor: pointer;
-            font-size: 0.75rem;
+            font-size: clamp(0.65rem, 2vw, 0.75rem);
             letter-spacing: 2px;
             transition: all 0.3s ease;
             text-transform: uppercase;
@@ -424,13 +465,13 @@
         }
 
         .daily-btn {
-            padding: 10px 18px;
+            padding: clamp(8px, 1.5vh, 10px) clamp(10px, 3vw, 18px);
             background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,140,0,0.15));
             border: 1px solid rgba(255,215,0,0.4);
             color: var(--gold);
             border-radius: 25px;
             cursor: pointer;
-            font-size: 0.75rem;
+            font-size: clamp(0.65rem, 2vw, 0.75rem);
             letter-spacing: 2px;
             transition: all 0.3s ease;
             text-transform: uppercase;
@@ -484,7 +525,8 @@
             justify-content: center;
             flex-direction: column;
             gap: 20px;
-            padding: 30px;
+            padding: 24px 16px;
+            overflow-y: auto;
         }
 
         .overlay.visible { display: flex; }
@@ -493,7 +535,7 @@
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 16px;
-            padding: 32px 40px;
+            padding: clamp(20px, 5vw, 32px) clamp(20px, 6vw, 40px);
             text-align: center;
             max-width: 320px;
             width: 100%;
@@ -501,7 +543,7 @@
 
         .overlay-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
+            font-size: clamp(1.3rem, 6vw, 1.8rem);
             font-weight: 900;
             color: var(--red);
             text-shadow: 0 0 20px rgba(255,68,68,0.5);
@@ -702,18 +744,19 @@
             border: 1px solid var(--panel-border);
             border-radius: 25px;
             padding: 3px;
-            margin-bottom: 8px;
+            margin-bottom: clamp(4px, 1vh, 8px);
+            flex-shrink: 0;
         }
 
         .mode-btn {
             flex: 1;
-            padding: 7px 0;
+            padding: clamp(5px, 1.2vh, 7px) 0;
             border: none;
             background: transparent;
             color: var(--text-dim);
             cursor: pointer;
-            font-size: 0.6rem;
-            letter-spacing: 2px;
+            font-size: clamp(0.52rem, 1.6vw, 0.6rem);
+            letter-spacing: clamp(1px, 0.5vw, 2px);
             text-transform: uppercase;
             font-family: 'Space Mono', monospace;
             border-radius: 20px;
@@ -760,22 +803,29 @@
 
         /* ===== STATUS LINE ===== */
         .status-line {
-            font-size: 0.62rem;
-            letter-spacing: 2px;
+            font-size: clamp(0.52rem, 1.6vw, 0.62rem);
+            letter-spacing: clamp(1px, 0.5vw, 2px);
             color: var(--text-dim);
             text-transform: uppercase;
             text-align: center;
-            min-height: 16px;
-            margin: 4px 0;
+            /* Fixed height so layout doesn't jump */
+            height: 16px;
+            line-height: 16px;
+            flex-shrink: 0;
+            margin: clamp(2px, 0.6vh, 4px) 0;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
         footer {
             color: #444;
-            font-size: 0.7rem;
-            margin: 16px 0;
+            font-size: clamp(0.55rem, 1.6vw, 0.7rem);
+            /* Compact footer on mobile */
+            margin: clamp(6px, 1.5vh, 16px) 0 clamp(4px, 1vh, 8px);
             text-align: center;
-            padding: 10px 20px;
+            padding: 6px 20px;
             z-index: 10;
+            flex-shrink: 0;
         }
 
         footer a { color: #666; margin: 0 10px; text-decoration: none; }
@@ -788,6 +838,21 @@
         }
 
         .heart.losing { animation: heartPop 0.4s ease forwards; }
+
+        /* ===== VERY SHORT SCREENS (e.g. iPhone SE landscape or short Android) ===== */
+        @media (max-height: 600px) {
+            .header { margin-bottom: 2px; }
+            .tagline { display: none; }
+            .status-line { display: none; }
+            footer { display: none; }
+            .ad-mobile { display: none; }
+        }
+
+        /* ===== NARROW PHONES (≤ 360px wide) ===== */
+        @media (max-width: 360px) {
+            .container { padding: 0 8px; }
+            .stat-label { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -994,28 +1059,16 @@
                 osc.stop(this.ctx.currentTime + delay + duration + 0.05);
             } catch(e) {}
         },
-        
-        // 🎵 NEW: Exponential pitch based on puzzle progress
         dotTapProgress(progress) {
             this.init();
-            const startFreq = 196;   // G3 - low starting pitch
-            const endFreq = 1175;    // D6 - high ending pitch
-            
-            // Exponential curve: smooth rise that accelerates toward the end
+            const startFreq = 196;
+            const endFreq = 1175;
             const freq = startFreq * Math.pow(endFreq / startFreq, progress);
-            
-            // Slightly shorter duration as progress increases for snappier end feedback
-            const duration = 0.14 - (progress * 0.06); // 0.14s → 0.08s
-            
-            const volume = 0.10 + (progress * 0.05); // 0.10 → 0.15
+            const duration = 0.14 - (progress * 0.06);
+            const volume = 0.10 + (progress * 0.05);
             this.tone(freq, 'sine', duration, volume);
         },
-        
-        // Keep original for fallback compatibility
-        dotTap(index) {
-            this.dotTapProgress(0.5); // Default middle pitch if called without progress
-        },
-        
+        dotTap(index) { this.dotTapProgress(0.5); },
         success() {
             this.init();
             [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 'sine', 0.15, 0.1, i * 0.08));
@@ -1080,14 +1133,13 @@
 
             this.levelsPerGrid = 5;
 
-            // New state
             this.lives = 3;
             this.maxLives = 3;
             this.score = 0;
             this.highScore = parseInt(localStorage.getItem('gitlines_highscore') || '0');
             this.streak = 0;
             this.bestStreak = 0;
-            this.mode = 'normal'; // 'normal' | 'daily'
+            this.mode = 'normal';
             this.dailyCompleted = false;
             this.dailySeed = getDailySeed();
             this.dailyRng = null;
@@ -1095,7 +1147,6 @@
             this.dailyLevel = 0;
             this.gameActive = false;
 
-            // Elements
             this.grid = document.getElementById('grid');
             this.svg = document.getElementById('svgLines');
             this.hintBtn = document.getElementById('hintBtn');
@@ -1110,7 +1161,6 @@
 
             this.highScoreDisplay.textContent = this.highScore;
 
-            // Check daily completion
             const savedDaily = localStorage.getItem('gitlines_daily_' + this.dailySeed);
             if (savedDaily) this.dailyCompleted = true;
 
@@ -1127,10 +1177,8 @@
         setMode(mode) {
             if (mode === this.mode) return;
             this.mode = mode;
-
             document.getElementById('normalModeBtn').classList.toggle('active', mode === 'normal');
             document.getElementById('dailyModeBtn').classList.toggle('active', mode === 'daily');
-
             if (mode === 'daily') {
                 this.dailyRng = seededRandom(this.dailySeed);
                 if (this.dailyCompleted) {
@@ -1141,7 +1189,6 @@
                 this.dailyErrors = 0;
                 this.dailyLevel = 0;
             }
-
             this.restartGame();
         }
 
@@ -1155,9 +1202,7 @@
             this.gameActive = true;
             this.dailyErrors = 0;
             this.dailyLevel = 0;
-            if (this.mode === 'daily') {
-                this.dailyRng = seededRandom(this.dailySeed);
-            }
+            if (this.mode === 'daily') this.dailyRng = seededRandom(this.dailySeed);
             this.updateUI();
             this.generateLevel();
         }
@@ -1178,11 +1223,8 @@
             }
         }
 
-        setStatus(msg) {
-            this.statusLine.textContent = msg;
-        }
+        setStatus(msg) { this.statusLine.textContent = msg; }
 
-        // ===== LEVEL GENERATION =====
         generateLevel() {
             if (!this.gameActive) return;
             if (this.showingIntro) this.cancelIntroPattern();
@@ -1190,7 +1232,6 @@
                 this._hintTimeouts.forEach(id => clearTimeout(id));
                 this._hintTimeouts = null;
             }
-
             this.gridSize = this.baseSize + Math.floor((this.level - 1) / this.levelsPerGrid);
             this.createGrid();
             this.generatePattern();
@@ -1275,7 +1316,6 @@
             }
         }
 
-        // ===== INTRO ANIMATION =====
         showIntroPattern() {
             this.showingIntro = true;
             this.hintBtn.disabled = true;
@@ -1285,7 +1325,7 @@
             this._introTimeouts = [];
 
             const containerRect = this.grid.getBoundingClientRect();
-            const stepDelay = Math.max(60, 120 - this.level * 3); // speeds up with level
+            const stepDelay = Math.max(60, 120 - this.level * 3);
 
             const lineElements = [];
             for (let i = 0; i < this.targetPattern.length - 1; i++) {
@@ -1341,7 +1381,6 @@
             this.showingIntro = false;
         }
 
-        // ===== EVENTS =====
         setupEvents() {
             const container = document.getElementById('gridContainer');
             const getDotFromEvent = (e) => {
@@ -1409,13 +1448,10 @@
         addToPattern(index) {
             this.currentPattern.push(index);
             this.dots[index].el.classList.add('active');
-            
-            // 🎵 Calculate progress for exponential pitch feedback
-            const progress = this.targetPattern.length > 0 
-                ? this.currentPattern.length / this.targetPattern.length 
+            const progress = this.targetPattern.length > 0
+                ? this.currentPattern.length / this.targetPattern.length
                 : 0.5;
             AudioEngine.dotTapProgress(progress);
-            
             this.drawLines();
             if (this.currentPattern.length === this.targetPattern.length) {
                 AudioEngine.tone(1319, 'sine', 0.2, 0.2);
@@ -1460,49 +1496,32 @@
 
         vibrate(pattern) { if ('vibrate' in navigator) navigator.vibrate(pattern); }
 
-        // ===== SUCCESS =====
         onSuccess() {
             this.isComplete = true;
-
-            // Score: base points + streak bonus + level multiplier
             const base = this.gridSize * this.gridSize * 10;
             const streakBonus = Math.min(this.streak, 10) * 5;
             const levelMult = 1 + (this.level - 1) * 0.1;
             const points = Math.round((base + streakBonus) * levelMult);
             this.score += points;
-
-            // Streak
             this.streak++;
             if (this.streak > this.bestStreak) this.bestStreak = this.streak;
-
-            // High score
             if (this.score > this.highScore) {
                 this.highScore = this.score;
                 localStorage.setItem('gitlines_highscore', this.highScore);
             }
-
-            // Flash & sound
             this.flash.className = 'flash success show';
             setTimeout(() => this.flash.classList.remove('show'), 150);
             AudioEngine.success();
             this.vibrate(50);
             this.createParticles();
             this.updateUI();
-
-            // Streak popup at milestones
             if (this.streak > 0 && this.streak % 3 === 0) {
                 this.showStreakPopup(this.streak);
                 AudioEngine.streak();
             }
-
-            // Daily tracking
-            if (this.mode === 'daily') {
-                this.dailyLevel = this.level;
-            }
-
+            if (this.mode === 'daily') this.dailyLevel = this.level;
             const nextLevel = this.level + 1;
             const isMilestone = nextLevel % 5 === 1 && nextLevel > 1;
-
             setTimeout(() => {
                 if (isMilestone) {
                     this.showMilestone(nextLevel);
@@ -1515,35 +1534,26 @@
             }, isMilestone ? 300 : 1200);
         }
 
-        // ===== FAILURE =====
         onFailure() {
             this.flash.className = 'flash error show';
             setTimeout(() => this.flash.classList.remove('show'), 200);
-
             this.svg.querySelectorAll('path.line').forEach(p => p.classList.add('error'));
             this.currentPattern.forEach(idx => this.dots[idx].el.classList.add('error'));
             this.gridContainer.classList.add('shake');
             setTimeout(() => this.gridContainer.classList.remove('shake'), 400);
-
-            // Lose a life
             this.lives--;
             this.streak = 0;
             if (this.mode === 'daily') this.dailyErrors++;
-
             AudioEngine.failure();
             this.vibrate([30, 50, 30]);
-
-            // Animate heart loss
             const lostHeart = document.getElementById('heart' + this.lives);
             if (lostHeart) {
                 AudioEngine.lostLife();
                 lostHeart.classList.add('losing');
                 setTimeout(() => { lostHeart.classList.remove('losing'); lostHeart.classList.add('lost'); }, 400);
             }
-
             this.updateUI();
             this.setStatus(this.lives > 0 ? `${this.lives} ${this.lives === 1 ? 'life' : 'lives'} remaining` : 'Game over!');
-
             if (this.lives <= 0) {
                 setTimeout(() => this.triggerGameOver(), 900);
             } else {
@@ -1557,7 +1567,6 @@
 
         triggerGameOver() {
             if (this.mode === 'daily') {
-                // Daily: save result and show daily overlay
                 localStorage.setItem('gitlines_daily_' + this.dailySeed, JSON.stringify({
                     level: this.level, score: this.score, errors: this.dailyErrors, streak: this.bestStreak
                 }));
@@ -1565,14 +1574,11 @@
                 this.showDailyComplete();
                 return;
             }
-
             AudioEngine.gameOver();
             this.gameActive = false;
-
             document.getElementById('finalLevel').textContent = this.level;
             document.getElementById('finalScore').textContent = this.score;
             document.getElementById('finalStreak').textContent = this.bestStreak;
-
             const isNewRecord = this.score >= this.highScore && this.score > 0;
             const hsEl = document.getElementById('finalHighScore');
             hsEl.textContent = this.highScore;
@@ -1582,7 +1588,6 @@
             } else {
                 hsEl.className = 'overlay-stat-val';
             }
-
             document.getElementById('gameOverOverlay').classList.add('visible');
         }
 
@@ -1599,7 +1604,6 @@
             this.setMode('normal');
         }
 
-        // ===== HINT =====
         showHint() {
             if (this.isComplete || this.showingIntro) return;
             this.hintBtn.disabled = true;
@@ -1624,7 +1628,6 @@
             animateHintStep(0);
         }
 
-        // ===== POPUPS =====
         showStreakPopup(streak) {
             const popup = document.getElementById('streakPopup');
             const emojis = ['🔥', '💥', '⚡', '🌟', '👑'];
@@ -1644,7 +1647,6 @@
             setTimeout(() => popup.classList.remove('show'), 2000);
         }
 
-        // ===== PARTICLES =====
         createParticles() {
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
@@ -1664,7 +1666,6 @@
             }
         }
 
-        // ===== SHARE =====
         shareScore() {
             const text = `🎮 GitLines\nLevel: ${this.level} | Score: ${this.score}\nStreak: ${this.bestStreak} | Best: ${this.highScore}\nCan you beat me? gitlines.app`;
             navigator.clipboard?.writeText(text).then(() => {
